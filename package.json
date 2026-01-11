@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@telegram-apps/sdk-react": "^3.3.9",
     "@ton/core": "^0.62.0",
     "@ton/ton": "^16.1.0",
     "@tonconnect/ui-react": "^2.3.1",
