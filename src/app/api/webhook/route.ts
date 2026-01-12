@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import TelegramBot from "node-telegram-bot-api";
 
 const token = "8441898048:AAGWVUB8EuWnW0RzHV5TB1E3OSvabSofkRE";
-const bot = new TelegramBot(token);
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();

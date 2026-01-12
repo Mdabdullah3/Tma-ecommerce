@@ -9,12 +9,16 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@telegram-apps/sdk": "^3.11.8",
     "@telegram-apps/sdk-react": "^3.3.9",
     "@ton/core": "^0.62.0",
     "@ton/ton": "^16.1.0",
     "@tonconnect/ui-react": "^2.3.1",
+    "@twa-dev/sdk": "^8.0.2",
     "@types/telegram-web-app": "^9.1.1",
+    "dotenv": "^17.2.3",
     "framer-motion": "^12.25.0",
+    "lucide-react": "^0.562.0",
     "next": "16.1.1",
     "node-telegram-bot-api": "^0.67.0",
     "react": "19.2.3",
