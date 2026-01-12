@@ -7,27 +7,54 @@ import { User, Shield, Wallet } from 'lucide-react';
 export default function SovereignHeader() {
     const [user, setUser] = useState({ name: "DIRECTOR_01", photo: "" });
     const [status, setStatus] = useState<'idle' | 'active'>('idle');
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        // 2. Import the SDK inside useEffect (Client-side only)
-        const initWebApp = async () => {
-            const WebApp = (await import('@twa-dev/sdk')).default;
+        setMounted(true);
 
-            WebApp.ready();
-            WebApp.expand();
-            WebApp.setHeaderColor('#000000');
+        if (typeof window !== 'undefined') {
+            const initWebApp = async () => {
+                try {
+                    const WebApp = (await import('@twa-dev/sdk')).default;
 
-            const tg = WebApp.initDataUnsafe?.user;
-            if (tg) {
-                setUser({
-                    name: tg.first_name.toUpperCase(),
-                    photo: tg.photo_url || ""
-                });
-            }
-        };
+                    WebApp.ready();
+                    WebApp.expand();
+                    WebApp.setHeaderColor('#000000');
 
-        initWebApp();
+                    const tg = WebApp.initDataUnsafe?.user;
+                    if (tg) {
+                        setUser({
+                            name: tg.first_name.toUpperCase(),
+                            photo: tg.photo_url || ""
+                        });
+                    }
+                } catch (error) {
+                    console.error('Failed to initialize WebApp:', error);
+                }
+            };
+
+            initWebApp();
+        }
     }, []);
+
+    if (!mounted) {
+        return (
+            // Loading skeleton
+            <header className="fixed top-0 inset-x-0 z-100 px-6 pt-6 pb-2">
+                <div className="absolute inset-x-4 top-4 bottom-0 bg-white/3 backdrop-blur-2xl rounded-[32px] border border-white/10" />
+                <div className="relative z-10 flex items-center justify-between px-4">
+                    <div className="flex items-center gap-4">
+                        <div className="w-11 h-11 rounded-full bg-gray-800" />
+                        <div className="space-y-2">
+                            <div className="w-20 h-2 bg-gray-800 rounded" />
+                            <div className="w-24 h-3 bg-gray-700 rounded" />
+                        </div>
+                    </div>
+                    <div className="w-32 h-10 bg-gray-800 rounded-full" />
+                </div>
+            </header>
+        );
+    }
     return (
         <motion.header
             initial={{ opacity: 0 }}

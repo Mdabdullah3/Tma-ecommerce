@@ -1,13 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import WebApp from '@twa-dev/sdk';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
-const CyberHeader = dynamic(() => import('@/components/Header'), {
-  ssr: false
-}); import FloatingCartButton from '@/components/FloatingCartButton';
+const CyberHeader = dynamic(() => import('@/components/Header'), { ssr: false });
+const FloatingCartButton = dynamic(() => import('@/components/FloatingCartButton'), { ssr: false });
 
 const PRODUCTS = [
   { id: 1, name: "ROSE_GENESIS", price: "2.40", cat: "ART", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe" },
@@ -19,17 +17,8 @@ const PRODUCTS = [
 export default function MobileBoutique2026() {
   const [cartCount, setCartCount] = useState(0);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      WebApp.ready();
-      WebApp.expand();
-      WebApp.setHeaderColor('#0A0A0A');
-      WebApp.setBackgroundColor('#0A0A0A');
-    }
-  }, []);
 
   const addToCart = () => {
-    WebApp.HapticFeedback.notificationOccurred('success');
     setCartCount(prev => prev + 1);
   };
 
