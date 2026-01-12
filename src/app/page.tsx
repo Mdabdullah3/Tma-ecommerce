@@ -4,14 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowUpRight, Zap } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import CategorySlider from '@/components/CategorySlider';
 const CyberHeader = dynamic(() => import('@/components/Header'), { ssr: false });
 const FloatingCartButton = dynamic(() => import('@/components/FloatingCartButton'), { ssr: false });
 
 const PRODUCTS = [
-  { id: 1, name: "ROSE_GENESIS", price: "2.40", cat: "ART", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe" },
-  { id: 2, name: "AMETHYST_V1", price: "1.15", cat: "WEAR", img: "https://images.unsplash.com/photo-1635339001024-6da089bc6074" },
-  { id: 3, name: "CHROME_CORE", price: "4.80", cat: "HARD", img: "https://images.unsplash.com/photo-1614728263952-84ea206f9c41" },
-  { id: 4, name: "NOIR_ELEMENT", price: "0.95", cat: "ACC", img: "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4" },
+  { id: 1, name: "ROSE_GENESIS", price: "2.40", cat: "ART", img: "https://nftmak.netlify.app/assets/img/others/top_collection01.jpg" },
+  { id: 2, name: "AMETHYST_V1", price: "1.15", cat: "WEAR", img: "https://nftmak.netlify.app/assets/img/others/top_collection02.jpg" },
+  { id: 3, name: "CHROME_CORE", price: "4.80", cat: "HARD", img: "https://shreethemes.in/superex/layouts/images/items/3.jpg" },
+  { id: 4, name: "NOIR_ELEMENT", price: "0.95", cat: "ACC", img: "https://shreethemes.in/superex/layouts/images/items/1.jpg" },
 ];
 
 export default function MobileBoutique2026() {
@@ -26,75 +27,9 @@ export default function MobileBoutique2026() {
     <div className="min-h-screen bg-[#050505] text-white selection:bg-rose-500 pb-24">
       <CyberHeader />
 
-      <main className="pt-24 px-4 space-y-8">
+      <main className="pt-24 px-4 space-y-6">
         {/* --- PREMIUM HERO: THE ANNOUNCEMENT --- */}
-        <section className="relative h-52 rounded-[32px] overflow-hidden border border-white/10 group bg-black">
-          {/* --- LAYER 1: THE TEXTURE & IMAGE --- */}
-          <motion.div
-            initial={{ scale: 1.2 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 2, ease: "easeOut" }}
-            className="absolute inset-0"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe"
-              className="w-full h-full object-cover brightness-[0.6] grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-[3000ms] ease-out"
-              alt="Hero"
-            />
-            {/* Subtle Noise Overlay for Film Grain effect */}
-            <div className="absolute inset-0 opacity-[0.15] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-          </motion.div>
-
-          {/* --- LAYER 2: THE AMBIENT ROSE GLOW --- */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-          <motion.div
-            animate={{
-              opacity: [0.3, 0.6, 0.3],
-              x: [-10, 10, -10]
-            }}
-            transition={{ duration: 5, repeat: Infinity }}
-            className="absolute top-0 right-0 w-64 h-64 bg-rose-600/20 blur-[80px] rounded-full"
-          />
-
-          {/* --- LAYER 3: KINETIC TYPOGRAPHY --- */}
-          <div className="absolute inset-0 p-8 flex flex-col justify-end overflow-hidden">
-
-            {/* Top Label with Line */}
-            <div className="flex items-center gap-3 mb-2 translate-y-2 opacity-60">
-              <span className="text-[9px] font-black tracking-[0.5em] text-rose-400 uppercase">
-                Season_2026
-              </span>
-            </div>
-
-            {/* Main Headline: Large & Bold */}
-            <div className="relative">
-              <h2 className="text-5xl font-black italic tracking-tighter leading-none uppercase mix-blend-difference">
-                Aura
-                <motion.span
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 1 }}
-                  className="block text-rose-500 not-italic ml-6"
-                >
-                  Noir
-                </motion.span>
-              </h2>
-
-              {/* Decorative vertical text for luxury feel */}
-              <div className="absolute -right-4 bottom-0 rotate-90 origin-bottom-right">
-                <span className="text-[7px] font-bold text-white/20 tracking-[1em] uppercase whitespace-nowrap">
-                  LIMITED_EDITION_COLLECTION
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* --- LAYER 4: OPTICAL FLARE (The "Wow" Touch) --- */}
-          <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-            <div className="absolute top-[20%] left-[-10%] w-[120%] h-[1px] bg-gradient-to-r from-transparent via-rose-500/30 to-transparent rotate-[-15deg] blur-sm" />
-          </div>
-        </section>
-
+        <CategorySlider />
         {/* --- DYNAMIC PRODUCT GRID --- */}
         <div className="grid grid-cols-2 gap-4">
           {PRODUCTS.map((item) => (
@@ -107,12 +42,12 @@ export default function MobileBoutique2026() {
               className="relative flex flex-col group"
             >
               {/* --- CARD ARCHITECTURE --- */}
-              <div className="relative aspect-4/5 rounded-[40px] overflow-hidden border border-white/10 bg-linear-to-b from-white/[0.07] to-transparent shadow-2xl transition-all duration-500 group-hover:border-rose-500/30">
+              <div className="relative aspect-4/5 rounded-[40px] overflow-hidden border border-white/10  shadow-2xl transition-all duration-500 group-hover:border-rose-500/30">
 
                 {/* Product Asset (Image) */}
                 <motion.img
                   src={item.img}
-                  className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000"
+                  className="w-full h-full object-cover  group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000"
                   alt={item.name}
                 />
 
@@ -145,8 +80,7 @@ export default function MobileBoutique2026() {
                   </div>
                 </div>
 
-                {/* Subtle Rose Light Leak (Appears on Hover) */}
-                <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-rose-600/0 group-hover:bg-rose-600/20 blur-[60px] transition-all duration-700" />
+
               </div>
 
               {/* --- TYPOGRAPHY FOOTER --- */}

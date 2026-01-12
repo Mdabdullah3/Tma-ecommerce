@@ -24,3 +24,43 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+/* app/globals.css */
+
+/* ... (Your existing Tailwind base, components, utilities, and custom fonts) ... */
+
+/* Custom styles for Swiper to hide default elements and ensure custom scroll behavior */
+.swiper.category-slider {
+  /* Hide default scrollbar on some browsers that might still show it */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  /* For WebKit (Chrome, Safari), we use a pseudo-element, which is already in your global styles */
+}
+
+/* Hide Swiper's default navigation arrows if they somehow appear */
+.swiper-button-prev,
+.swiper-button-next {
+  display: none !important;
+}
+
+/* Hide Swiper's default pagination dots if you're not using them or have custom ones */
+.swiper-pagination {
+  display: none !important;
+}
+
+/* Ensure slides don't have extra padding that might break fixed width */
+.swiper-slide {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+/* ... (Your existing global animations like pulse-slow) ... */
+@keyframes pulse-slow {
+    0%, 100% { opacity: 0.05; transform: scale(1); }
+    50% { opacity: 0.15; transform: scale(1.05); }
+}
+.animate-pulse-slow {
+    animation: pulse-slow 8s infinite ease-in-out;
+}
