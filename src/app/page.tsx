@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import WebApp from '@twa-dev/sdk';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, ShoppingBag, Zap, Sparkles } from 'lucide-react';
-import CyberHeader from '@/components/Header';
-import FloatingCartButton from '@/components/FloatingCartButton';
+import { motion } from 'framer-motion';
+import { ArrowUpRight, Zap } from 'lucide-react';
+import dynamic from 'next/dynamic';
+const CyberHeader = dynamic(() => import('@/components/Header'), {
+  ssr: false
+}); import FloatingCartButton from '@/components/FloatingCartButton';
 
 const PRODUCTS = [
   { id: 1, name: "ROSE_GENESIS", price: "2.40", cat: "ART", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe" },
