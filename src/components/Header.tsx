@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import WebApp from '@twa-dev/sdk';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Shield, Wallet } from 'lucide-react';
 
@@ -10,21 +9,25 @@ export default function SovereignHeader() {
     const [status, setStatus] = useState<'idle' | 'active'>('idle');
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
+        // 2. Import the SDK inside useEffect (Client-side only)
+        const initWebApp = async () => {
+            const WebApp = (await import('@twa-dev/sdk')).default;
+
             WebApp.ready();
             WebApp.expand();
             WebApp.setHeaderColor('#000000');
+
             const tg = WebApp.initDataUnsafe?.user;
             if (tg) {
-                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setUser({
                     name: tg.first_name.toUpperCase(),
                     photo: tg.photo_url || ""
                 });
             }
-        }
-    }, []);
+        };
 
+        initWebApp();
+    }, []);
     return (
         <motion.header
             initial={{ opacity: 0 }}
