@@ -1,11 +1,9 @@
+/* eslint-disable react-hooks/purity */
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-    Star, Shirt, Palette, Layers, Headphones,
-    Zap, Cpu, Radio, Target, Activity
-} from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Star, Shirt, Palette, Layers, Sparkles } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { FreeMode } from 'swiper/modules';
 
@@ -13,92 +11,102 @@ import 'swiper/css';
 import 'swiper/css/free-mode';
 
 const CATEGORIES = [
-    { id: 'all', name: 'GENESIS', icon: Star, tier: 'S-01', power: 98, status: 'SYNCED' },
-    { id: 'wear', name: 'APPAREL', icon: Shirt, tier: 'A-04', power: 72, status: 'ACTIVE' },
-    { id: 'art', name: 'ARTIFACTS', icon: Palette, tier: 'X-02', power: 45, status: 'LOADED' },
-    { id: 'hard', name: 'HARDWARE', icon: Layers, tier: 'B-09', power: 88, status: 'LINKED' },
-    { id: 'acc', name: 'ACCESS', icon: Headphones, tier: 'C-07', power: 61, status: 'ONLINE' },
+    { id: 'all', name: 'GENESIS', icon: Star, color: '#10b981', shadow: 'rgba(244, 63, 94, 0.6)', label: 'SERIES.01' },
+    { id: 'wear', name: 'APPAREL', icon: Shirt, color: '#fbbf24', shadow: 'rgba(251, 191, 36, 0.6)', label: 'NEO_LAVA' },
+    { id: 'art', name: 'ARTIFACTS', icon: Palette, color: '#3b82f6', shadow: 'rgba(59, 130, 246, 0.6)', label: 'CYBER_X' },
+    { id: 'hard', name: 'HARDWARE', icon: Layers, color: '#a855f7', shadow: 'rgba(168, 85, 247, 0.6)', label: 'CORE_V2' },
+    { id: 'luxe', name: 'CURATED', icon: Sparkles, color: '#f43f5e', shadow: 'rgba(16, 185, 129, 0.6)', label: 'VVIP_ID' },
 ];
 
-const CategorySlider: React.FC = () => {
+export default function PrismVaultSlider() {
     const [active, setActive] = useState('all');
 
     return (
         <section className="relative overflow-hidden">
 
-
-            {/* --- KINETIC ARTEFACT SLIDER --- */}
-            <div className="relative z-10 px-4">
+            <div className="relative z-10">
                 <Swiper
                     slidesPerView={'auto'}
-                    spaceBetween={16}
                     freeMode={true}
                     modules={[FreeMode]}
                     className="overflow-visible!"
                 >
                     {CATEGORIES.map((cat) => (
-                        <SwiperSlide key={cat.id} className="!w-auto">
+                        <SwiperSlide key={cat.id} className="w-auto!">
                             <motion.div
-                                whileTap={{ scale: 0.92, rotate: -1 }}
+                                whileTap={{ scale: 0.94 }}
                                 onClick={() => setActive(cat.id)}
-                                className="relative cursor-pointer group py-2"
+                                className="relative cursor-pointer py-2 mr-2"
                             >
-                                {/* --- THE BLACK-LABEL CASE --- */}
-                                <div className={`
-                                    relative w-[145px] h-[105px] rounded-[32px] transition-all duration-1000 overflow-hidden border-[1px]
-                                    ${active === cat.id
-                                        ? 'bg-rose-500/10 border-rose-500/40 shadow-[0_20px_50px_rgba(244,63,94,0.15)]'
-                                        : 'bg-white/[0.01] border-white/[0.05] grayscale-[0.8] hover:grayscale-0 hover:border-white/20'}
+                                {/* --- THE CHROMATIC GLASS CHAMBER --- */}
+                                <div
+                                    style={{
+                                        backgroundColor: `${cat.color}15`, // 15% opacity tint
+                                        borderColor: `${cat.color}40`,     // 40% opacity border
+                                   
+                                    }}
+                                    className={`
+                                    relative w-[130px] h-[120px] rounded-[50px] transition-all duration-700 border-[1.5px] backdrop-blur-md overflow-hidden
+                                    ${active === cat.id ? '-translate-y-1 scale-100' : 'scale-95'}
                                 `}>
 
-                                    {/* INTERNAL CARBON FIBER TEXTURE (Subtle) */}
-                                    <div className="absolute inset-0 opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none" />
+                                    {/* INTERNAL REFRACTIVE GLOSS */}
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.05] via-transparent to-transparent z-0" />
 
-                                    {/* HOLOGRAPHIC LIGHT LEAK */}
-                                    <AnimatePresence>
-                                        {active === cat.id && (
-                                            <motion.div
-                                                initial={{ opacity: 0, x: '-100%' }}
-                                                animate={{ opacity: 1, x: '100%' }}
-                                                exit={{ opacity: 0 }}
-                                                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                                                className="absolute inset-0 bg-gradient-to-r from-transparent via-rose-500/10 to-transparent skew-x-12 z-0"
-                                            />
-                                        )}
-                                    </AnimatePresence>
+                                    {/* KINETIC LIGHT LEAK (Persistent on all cards) */}
+                                    <motion.div
+                                        animate={{ y: ['-100%', '200%'] }}
+                                        transition={{ duration: 5, repeat: Infinity, ease: "linear", delay: Math.random() * 2 }}
+                                        style={{ background: `linear-gradient(180deg, transparent, ${cat.color}22, transparent)` }}
+                                        className="absolute inset-x-0  w-full skew-y-12 z-10 pointer-events-none"
+                                    />
 
-                                    {/* CONTENT LAYER */}
-                                    <div className="relative z-10 h-full p-4 flex flex-col justify-between">
-                                        <div className="flex justify-between items-start">
-                                            <div className={`p-2 rounded-xl transition-all duration-700 ${active === cat.id ? 'bg-rose-500 text-white shadow-lg' : 'bg-white/5 text-zinc-600'}`}>
-                                                <cat.icon size={16} />
-                                            </div>
-                                            <div className="text-right">
-                                                <p className={`text-[7px] font-mono font-black mb-0.5 ${active === cat.id ? 'text-rose-400' : 'text-zinc-800'}`}>
-                                                    {cat.tier}
-                                                </p>
-                                                <div className={`h-[2px] w-4 ml-auto rounded-full ${active === cat.id ? 'bg-rose-500' : 'bg-zinc-900'}`} />
-                                            </div>
+                                    {/* CONTENT HIERARCHY */}
+                                    <div className="relative z-20 h-full py-[18px] flex flex-col items-center justify-between">
+
+                                        {/* Serial/Technical ID */}
+                                        <div className="flex flex-col items-center gap-1">
+                                            <span
+                                                style={{ color: cat.color }}
+                                                className="text-[7px] font-mono font-black tracking-[0.2em]"
+                                            >
+                                                {cat.label}
+                                            </span>
+                                            <div className="h-[1px] w-4 bg-white/10" />
                                         </div>
 
-                                        <div className="space-y-2">
-                                            <div className="flex flex-col">
-                                                <span className={`text-[10px] font-black tracking-[0.1em] uppercase transition-all ${active === cat.id ? 'text-white' : 'text-zinc-500'}`}>
-                                                    {cat.name}
-                                                </span>
-                                                <span className="text-[6px] font-bold text-zinc-700 tracking-widest">{cat.status}</span>
-                                            </div>
+                                        {/* The Icon Module */}
+                                        <div
+                                            style={{ backgroundColor: cat.color }}
+                                            className="w-12 h-12 rounded-full flex items-center justify-center text-white shadow-2xl relative group"
+                                        >
+                                            <cat.icon size={22} strokeWidth={2.5} />
+                                            {/* Inner Ring Glow */}
+                                            <div className="absolute inset-[-4px] rounded-full border border-white/20 animate-pulse" />
+                                        </div>
 
-                                            
+                                        {/* Title & Status */}
+                                        <div className="flex flex-col items-center gap-1.5">
+                                            <h3 className="text-[11px] font-black tracking-widest text-white mt-2 leading-none">
+                                                {cat.name}
+                                            </h3>
+
                                         </div>
                                     </div>
+
+                                    {/* Bottom "Liquid" Level */}
+                                    <div
+                                        style={{ backgroundColor: cat.color }}
+                                        className="absolute bottom-0 left-0 right-0 h-full opacity-40 shadow-[0_0_15px_#fff]"
+                                    />
                                 </div>
 
-                                {/* ACTIVE ORBITAL INDICATOR */}
+                                {/* Active Selection Halo */}
                                 {active === cat.id && (
                                     <motion.div
-                                        layoutId="activeGlow"
-                                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-[2px] bg-rose-500 rounded-full shadow-[0_0_15px_#f43f5e]"
+                                        layoutId="activeHalo"
+                                        style={{ backgroundColor: cat.color }}
+                                        className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full blur-md opacity-60"
                                     />
                                 )}
                             </motion.div>
@@ -106,17 +114,6 @@ const CategorySlider: React.FC = () => {
                     ))}
                 </Swiper>
             </div>
-
-            {/* --- REFRACTIVE EDGE FADES --- */}
-            <div className="absolute top-0 left-0 h-full w-16 bg-gradient-to-r from-[#050505] to-transparent z-20 pointer-events-none" />
-            <div className="absolute top-0 right-0 h-full w-16 bg-gradient-to-l from-[#050505] to-transparent z-20 pointer-events-none" />
-
-            <style jsx global>{`
-                .no-scrollbar::-webkit-scrollbar { display: none; }
-                .text-outline { -webkit-text-stroke: 1px #f43f5e; color: transparent; }
-            `}</style>
         </section>
     );
-};
-
-export default CategorySlider;
+}

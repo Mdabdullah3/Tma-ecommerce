@@ -1,60 +1,30 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import WebApp from '@twa-dev/sdk';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Shield, Wallet } from 'lucide-react';
 
 export default function SovereignHeader() {
     const [user, setUser] = useState({ name: "DIRECTOR_01", photo: "" });
     const [status, setStatus] = useState<'idle' | 'active'>('idle');
-    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setMounted(true);
-
         if (typeof window !== 'undefined') {
-            const initWebApp = async () => {
-                try {
-                    const WebApp = (await import('@twa-dev/sdk')).default;
-
-                    WebApp.ready();
-                    WebApp.expand();
-                    WebApp.setHeaderColor('#000000');
-
-                    const tg = WebApp.initDataUnsafe?.user;
-                    if (tg) {
-                        setUser({
-                            name: tg.first_name.toUpperCase(),
-                            photo: tg.photo_url || ""
-                        });
-                    }
-                } catch (error) {
-                    console.error('Failed to initialize WebApp:', error);
-                }
-            };
-
-            initWebApp();
+            WebApp.ready();
+            WebApp.expand();
+            WebApp.setHeaderColor('#000000');
+            const tg = WebApp.initDataUnsafe?.user;
+            if (tg) {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
+                setUser({
+                    name: tg.first_name.toUpperCase(),
+                    photo: tg.photo_url || ""
+                });
+            }
         }
     }, []);
 
-    if (!mounted) {
-        return (
-            // Loading skeleton
-            <header className="fixed top-0 inset-x-0 z-100 px-6 pt-6 pb-2">
-                <div className="absolute inset-x-4 top-4 bottom-0 bg-white/3 backdrop-blur-2xl rounded-[32px] border border-white/10" />
-                <div className="relative z-10 flex items-center justify-between px-4">
-                    <div className="flex items-center gap-4">
-                        <div className="w-11 h-11 rounded-full bg-gray-800" />
-                        <div className="space-y-2">
-                            <div className="w-20 h-2 bg-gray-800 rounded" />
-                            <div className="w-24 h-3 bg-gray-700 rounded" />
-                        </div>
-                    </div>
-                    <div className="w-32 h-10 bg-gray-800 rounded-full" />
-                </div>
-            </header>
-        );
-    }
     return (
         <motion.header
             initial={{ opacity: 0 }}
@@ -73,15 +43,15 @@ export default function SovereignHeader() {
                         <motion.div
                             animate={{ opacity: [0.2, 0.5, 0.2] }}
                             transition={{ duration: 3, repeat: Infinity }}
-                            className="absolute -inset-2 bg-gradient-to-tr from-rose-500 to-transparent blur-xl rounded-full"
+                            className="absolute -inset-2 bg-gradient-to-tr from-amber-500 to-transparent blur-xl rounded-full"
                         />
                         <div className="relative w-11 h-11 rounded-full overflow-hidden border-[0.5px] border-white/30 p-[2px]">
-                            <div className="w-full h-full rounded-full overflow-hidden bg-zinc-900 shadow-inner">
+                            <div className="w-full h-full rounded-full overflow-hidden bg-amber-500 shadow-inner">
                                 {user.photo ? (
                                     <img src={user.photo} className="w-full h-full object-cover scale-110 grayscale" alt="U" />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center">
-                                        <User size={16} className="text-zinc-500" />
+                                        <User size={16} className="text-zinc-100" />
                                     </div>
                                 )}
                             </div>
@@ -103,7 +73,7 @@ export default function SovereignHeader() {
                     className={`group relative flex items-center gap-3 pl-4 pr-5 py-2.5 rounded-full overflow-hidden border transition-all duration-500 
                         ${status === 'active'
                             ? 'bg-white text-black border-white'
-                            : 'bg-transparent text-white border-white/10 hover:border-white/30'}`}
+                            : 'bg-amber-500 text-white border-white/10 hover:border-white/30'}`}
                 >
                     <AnimatePresence mode="wait">
                         {status === 'active' ? (
@@ -125,7 +95,7 @@ export default function SovereignHeader() {
                                 exit={{ y: -20, opacity: 0 }}
                                 className="flex items-center gap-2"
                             >
-                                <Wallet size={12} className="text-zinc-400 group-hover:text-white transition-colors" />
+                                <Wallet size={12} className="text-zinc-100 group-hover:text-white transition-colors" />
                                 <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Connect</span>
                             </motion.div>
                         )}

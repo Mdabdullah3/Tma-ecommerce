@@ -10,10 +10,11 @@ interface FloatingCartButtonProps {
     onClick: () => void;
 }
 
+
 const FloatingCartButton: React.FC<FloatingCartButtonProps> = ({ itemCount, onClick }) => {
     return (
         <motion.button
-            className="fixed bottom-10 right-4 z-50 p-4 bg-rose-600 hover:bg-rose-500 text-white rounded-full shadow-lg flex items-center justify-center transition-colors duration-200 ease-in-out"
+            className="fixed bottom-10 right-4 z-50 p-4 bg-amber-600 hover:bg-amber-500 text-white rounded-full shadow-lg flex items-center justify-center transition-colors duration-200 ease-in-out"
             onClick={onClick}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
