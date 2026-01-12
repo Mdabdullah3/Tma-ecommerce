@@ -176,7 +176,7 @@ export default function MobileBoutique2026() {
         </div>
       </main>
 
-      <FloatingCartButton itemCount={cartCount} onClick={() => WebApp.openCart()} />
+      <FloatingCartButton itemCount={cartCount} onClick={() => { }} />
 
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Satoshi:wght@700;900&display=swap');

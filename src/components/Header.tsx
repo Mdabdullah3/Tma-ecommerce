@@ -16,6 +16,7 @@ export default function SovereignHeader() {
             WebApp.setHeaderColor('#000000');
             const tg = WebApp.initDataUnsafe?.user;
             if (tg) {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setUser({
                     name: tg.first_name.toUpperCase(),
                     photo: tg.photo_url || ""
