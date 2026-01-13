@@ -34,7 +34,7 @@ export default function SovereignHeader() {
             {/* 1. LAYERED DEPTH: Glassmorphism Background */}
             <div className="absolute inset-x-4 top-4 bottom-0 bg-white/3 backdrop-blur-2xl rounded-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]" />
 
-            <div className="relative z-10 flex items-center justify-between px-4">
+            <div className="relative z-10 flex items-center justify-between px-2">
 
                 {/* --- LEFT: IDENTITY SECTION --- */}
                 <div className="flex items-center gap-2">
@@ -43,7 +43,7 @@ export default function SovereignHeader() {
                         <motion.div
                             animate={{ opacity: [0.2, 0.5, 0.2] }}
                             transition={{ duration: 3, repeat: Infinity }}
-                            className="absolute -inset-2 bg-gradient-to-tr from-primary to-transparent blur-xl rounded-full"
+                            className="absolute -inset-2 bg-linear-to-tr from-primary to-transparent blur-xl rounded-full"
                         />
                         <div className="relative w-11 h-11 rounded-full overflow-hidden border-[0.5px] border-white/30 p-[2px]">
                             <div className="w-full h-full rounded-full overflow-hidden bg-primary shadow-inner">

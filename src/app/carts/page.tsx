@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Trash2, Box, Ticket,
+    Trash2, Ticket,
     Hash, Cpu
 } from 'lucide-react';
 import Background from '@/components/Background';
