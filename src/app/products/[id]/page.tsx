@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import WebApp from '@twa-dev/sdk';
 import Background from '@/components/Background';
+import PageHeader from '@/components/PageHeader';
 
 const PRODUCT = {
     id: 1,
@@ -35,22 +36,7 @@ export default function ProductDetails() {
         <div className="min-h-screen bg-[#020617] text-white font-sans selection:bg-amber-500 overflow-x-hidden relative">
 
             <Background />
-
-            <nav className="fixed top-0 inset-x-0 z-100 px-6 py-4 flex justify-between items-center">
-                <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => window.history.back()}
-                    className="w-11 h-11 rounded-[16px] bg-white text-black flex items-center justify-center shadow-2xl"
-                >
-                    <ArrowLeft size={18} strokeWidth={3} />
-                </motion.button>
-                <motion.button
-                    whileTap={{ scale: 0.9 }}
-                    className="w-11 h-11 rounded-[16px] bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center"
-                >
-                    <Share2 size={18} className="text-zinc-200" />
-                </motion.button>
-            </nav>
+            <PageHeader title="PRODUCT_DETAILS" />
             <main className="relative z-10 pt-20 pb-40 px-6">
                 <section className="mb-10">
                     <motion.div
