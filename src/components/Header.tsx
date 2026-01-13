@@ -37,16 +37,16 @@ export default function SovereignHeader() {
             <div className="relative z-10 flex items-center justify-between px-4">
 
                 {/* --- LEFT: IDENTITY SECTION --- */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                     <div className="relative group">
                         {/* Animated Aura */}
                         <motion.div
                             animate={{ opacity: [0.2, 0.5, 0.2] }}
                             transition={{ duration: 3, repeat: Infinity }}
-                            className="absolute -inset-2 bg-gradient-to-tr from-amber-500 to-transparent blur-xl rounded-full"
+                            className="absolute -inset-2 bg-gradient-to-tr from-primary to-transparent blur-xl rounded-full"
                         />
                         <div className="relative w-11 h-11 rounded-full overflow-hidden border-[0.5px] border-white/30 p-[2px]">
-                            <div className="w-full h-full rounded-full overflow-hidden bg-amber-500 shadow-inner">
+                            <div className="w-full h-full rounded-full overflow-hidden bg-primary shadow-inner">
                                 {user.photo ? (
                                     <img src={user.photo} className="w-full h-full object-cover scale-110 grayscale" alt="U" />
                                 ) : (
@@ -59,7 +59,7 @@ export default function SovereignHeader() {
                     </div>
 
                     <div className="flex flex-col">
-                        <span className="text-[9px] font-medium tracking-tighter text-zinc-500 mb-0.5">Welcome to Swift</span>
+                        <span className="text-[10px] font-medium tracking-tight text-zinc-200 mb-0.5">Welcome to Swift</span>
                         <h2 className="text-xs font-bold tracking-widest text-white/90">
                             {user.name}
                         </h2>
@@ -73,7 +73,7 @@ export default function SovereignHeader() {
                     className={`group relative flex items-center gap-3 pl-4 pr-5 py-2.5 rounded-full overflow-hidden border transition-all duration-500 
                         ${status === 'active'
                             ? 'bg-white text-black border-white'
-                            : 'bg-amber-500 text-white border-white/10 hover:border-white/30'}`}
+                            : 'bg-primary text-white border-white/10 hover:border-white/30'}`}
                 >
                     <AnimatePresence mode="wait">
                         {status === 'active' ? (
