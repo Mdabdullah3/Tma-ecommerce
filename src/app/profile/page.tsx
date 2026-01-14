@@ -6,13 +6,14 @@ import { motion } from 'framer-motion';
 import {
     Wallet, Settings, ShoppingBag,
     Info, LogOut,
-    ChevronRight, 
+    ChevronRight,
     Fingerprint, Bell, Activity, Lock,
-    MessageSquare, 
+    MessageSquare,
 } from 'lucide-react';
 import WebApp from '@twa-dev/sdk';
 import Background from '@/components/Background';
 import PageHeader from '@/components/PageHeader';
+import Link from 'next/link';
 
 export default function EliteProfile() {
     const [user, setUser] = useState({ name: "DIRECTOR_01", photo: "", id: "8820-X" });
@@ -41,6 +42,7 @@ export default function EliteProfile() {
         color: string;
         label?: string;
         status?: string;
+        href?: string;
     };
 
     type MenuGroup = {
@@ -52,23 +54,21 @@ export default function EliteProfile() {
         {
             group: "Acquisition_Sector",
             items: [
-                { id: 'orders', name: 'Order Summary', icon: ShoppingBag, color: '#f59e0b', label: "ASSETS" }, // Amber
-                { id: 'wallet', name: 'Wallet Connect', icon: Wallet, color: '#fb923c', label: "TON", status: isConnected ? 'SYNCED' : 'LINK' }, // Orange
+                { id: 'orders', name: 'Order Summary', icon: ShoppingBag, color: '#f59e0b', label: "ASSETS", href: "/profile/order-history" }, // Amber
+                { id: 'wallet', name: 'Wallet Connect', icon: Wallet, color: '#fb923c', label: "TON", status: isConnected ? 'SYNCED' : 'LINK', href: "/profile/wallet-connect" }, // Orange
             ]
         },
         {
             group: "Security_Sector",
             items: [
-                { id: 'settings', name: 'Identity Settings', icon: Settings, color: '#06b6d4' }, // Cyan
-                { id: 'notifications', name: 'Alert System', icon: Bell, color: '#3b82f6' }, // Blue
-                { id: 'auth', name: 'Biometric Link', icon: Lock, color: '#6366f1' }, // Indigo
+                { id: 'settings', name: 'Identity Settings', icon: Settings, color: '#06b6d4', href: "/profile/identity-settings" }, // Cyan
             ]
         },
         {
             group: "Protocol_Sector",
             items: [
-                { id: 'support', name: 'Priority Support', icon: MessageSquare, color: '#a855f7' }, // Purple
-                { id: 'about', name: 'About Store', icon: Info, color: '#10b981' }, // Emerald
+                { id: 'support', name: 'Priority Support', icon: MessageSquare, color: '#a855f7', href: "/" }, // Purple
+                { id: 'about', name: 'About Store', icon: Info, color: '#10b981', href: "/" }, // Emerald
             ]
         }
     ];
@@ -78,10 +78,10 @@ export default function EliteProfile() {
             <Background />
             <PageHeader title="PROFILE" />
 
-            <main className="relative z-10 pt-24 px-6">
+            <main className="relative z-10 pt-20 px-6">
 
                 {/* --- 1. THE MULTI-SPECTRAL HERO --- */}
-                <section className="flex flex-col items-center mb-5">
+                <section className="flex flex-col items-center mb-4">
                     <div className="relative mb-2">
                         {/* Dynamic Multicolor Aura */}
                         <div className="absolute inset-0 bg-gradient-to-tr from-rose-500 via-cyan-500 to-amber-500 blur-[80px] opacity-20 animate-pulse" />
@@ -95,7 +95,7 @@ export default function EliteProfile() {
                                         <Fingerprint size={56} strokeWidth={1} className="text-white/10" />
                                     </div>
                                 )}
-                                
+
                             </div>
                         </div>
                     </div>
@@ -103,7 +103,7 @@ export default function EliteProfile() {
                     <div className="text-center">
                         <h1 className="text-xl font-black tracking-tighter uppercase leading-none text-white">
                             {user.name}
-                        </h1>                  
+                        </h1>
                     </div>
                 </section>
 
@@ -120,53 +120,46 @@ export default function EliteProfile() {
                                 <Activity size={10} className="text-zinc-800" />
                             </div>
 
-                            <div className="space-y-3">
+                            <div className="space-y-2">
                                 {group.items.map((item) => (
-                                    <motion.button
-                                        key={item.id}
-                                        whileTap={{ scale: 0.97 }}
-                                        onClick={() => item.id === 'wallet' && setIsConnected(!isConnected)}
-                                        className="relative w-full group overflow-hidden"
-                                    >
-                                        {/* COLORFUL BACKGROUND: Subtle tint of the item's unique color */}
-                                        <div
-                                            style={{ backgroundColor: `${item.color}08`, borderColor: `${item.color}20` }}
-                                            className="absolute inset-0 border rounded-[35px] -z-10 group-hover:scale-105 transition-all duration-500"
-                                        />
-
-                                        <div className="p-3 flex items-center justify-between">
-                                            <div className="flex items-center gap-5">
-                                                {/* SOLID COLOR ICON BOX */}
-                                                <div
-                                                    style={{ backgroundColor: item.color }}
-                                                    className="w-10 h-10 rounded-[24px] flex items-center justify-center text-black shadow-lg group-hover:scale-110 transition-all duration-500"
-                                                >
-                                                    <item.icon size={22} strokeWidth={2.5} />
-                                                </div>
-
-                                                <div className="flex flex-col items-start">
-                                                    <span className="text-xs font-black  tracking-tighter uppercase text-white leading-none group-hover:text-white transition-colors">
-                                                        {item.name}
-                                                    </span>
-                                                    {item.status ? (
-                                                        <span style={{ color: isConnected ? '#22c55e' : item.color }} className="text-[7px] font-bold tracking-[0.2em] mt-1.5 opacity-80">
-                                                            {item.status}
-                                                        </span>
-                                                    ) : (
-                                                        <span style={{ color: item.color }} className="text-[7px] font-bold tracking-[0.2em] mt-1.5 opacity-40 uppercase">
-                                                            Authorized_Access
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
+                                    <Link href={item.href || "#"} key={item.id}>
+                                        <motion.button
+                                            whileTap={{ scale: 0.97 }}
+                                            onClick={() => item.id === 'wallet' && setIsConnected(!isConnected)}
+                                            className="relative w-full group overflow-hidden mt-3"
+                                        >
+                                            {/* COLORFUL BACKGROUND: Subtle tint of the item's unique color */}
                                             <div
-                                                style={{ backgroundColor: `${item.color}20` }}
-                                                className="w-8 h-8 rounded-full flex items-center justify-center text-white/20 group-hover:text-white transition-all"
-                                            >
-                                                <ChevronRight size={16} />
+                                                style={{ backgroundColor: `${item.color}08`, borderColor: `${item.color}20` }}
+                                                className="absolute inset-0 border rounded-[35px] -z-10 group-hover:scale-105 transition-all duration-500"
+                                            />
+
+                                            <div className="p-3 flex items-center justify-between">
+                                                <div className="flex items-center gap-5">
+                                                    {/* SOLID COLOR ICON BOX */}
+                                                    <div
+                                                        style={{ backgroundColor: item.color }}
+                                                        className="w-10 h-10 rounded-[24px] flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-all duration-500"
+                                                    >
+                                                        <item.icon size={22} strokeWidth={2.5} />
+                                                    </div>
+
+                                                    <div className="flex flex-col items-start">
+                                                        <span className="text-xs font-black  tracking-tighter uppercase text-white leading-none group-hover:text-white transition-colors">
+                                                            {item.name}
+                                                        </span>
+                                                        
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    style={{ backgroundColor: `${item.color}20` }}
+                                                    className="w-8 h-8 rounded-full flex items-center justify-center text-white/20 group-hover:text-white transition-all"
+                                                >
+                                                    <ChevronRight size={16} />
+                                                </div>
                                             </div>
-                                        </div>
-                                    </motion.button>
+                                        </motion.button>
+                                    </Link>
                                 ))}
                             </div>
                         </div>
@@ -189,7 +182,7 @@ export default function EliteProfile() {
                             </span>
                         </motion.button>
 
-                        
+
                     </div>
                 </div>
             </main>
