@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import WebApp from '@twa-dev/sdk';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Shield, Wallet } from 'lucide-react';
+import Link from 'next/link';
 
 export default function SovereignHeader() {
     const [user, setUser] = useState({ name: "DIRECTOR_01", photo: "" });
@@ -46,7 +47,7 @@ export default function SovereignHeader() {
                             className="absolute -inset-2 bg-linear-to-tr from-primary to-transparent blur-xl rounded-full"
                         />
                         <div className="relative w-11 h-11 rounded-full overflow-hidden border-[0.5px] border-white/30 p-[2px]">
-                            <div className="w-full h-full rounded-full overflow-hidden bg-primary shadow-inner">
+                            <Link href="/profile" className="w-full h-full rounded-full overflow-hidden bg-primary shadow-inner">
                                 {user.photo ? (
                                     <img src={user.photo} className="w-full h-full object-cover scale-110 grayscale" alt="U" />
                                 ) : (
@@ -54,7 +55,7 @@ export default function SovereignHeader() {
                                         <User size={16} className="text-zinc-100" />
                                     </div>
                                 )}
-                            </div>
+                            </Link>
                         </div>
                     </div>
 
