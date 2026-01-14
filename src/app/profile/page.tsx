@@ -14,7 +14,7 @@ import PageHeader from '@/components/PageHeader';
 import MenuButton from '@/components/MenuButton';
 import Link from 'next/link';
 import SecurityGateModal from '@/components/SecurityGateModal';
-import AdminDashboard from '../admin/page';
+import { useRouter } from 'next/navigation';
 
 const MENU_ITEMS = [
     { id: 'orders', name: 'ORDER_SUMMARY', icon: ShoppingBag, color: '#f59e0b', href: '/profile/order-history' },
@@ -25,7 +25,7 @@ export default function EliteProfile() {
     const [user, setUser] = useState({ name: "DIRECTOR_01", photo: "" });
     const [showAdminGate, setShowAdminGate] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
-
+    const router = useRouter();
     useEffect(() => {
         if (typeof window !== 'undefined') {
             WebApp.ready();
@@ -37,7 +37,7 @@ export default function EliteProfile() {
     }, []);
 
     if (isAdmin) {
-        return <AdminDashboard onTerminateAccess={() => setIsAdmin(false)} />;
+        return router.push('/admin');
     }
 
     return (
