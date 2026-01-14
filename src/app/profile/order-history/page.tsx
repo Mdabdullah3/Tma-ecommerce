@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import WebApp from '@twa-dev/sdk';
 import Background from '@/components/Background'; // Assuming this provides a sophisticated dark background
-import PageHeader from '@/components/PageHeader'; // Assuming this provides a consistent header
+import PageHeader from '@/components/PageHeader';
 
 const PURCHASES = [
     { id: "ORD-90281", name: "ROSE_GENESIS", status: "Delivered", price: "2.40", date: "Oct 24, 2026", img: "https://nftmak.netlify.app/assets/img/others/top_collection01.jpg" },
@@ -73,7 +73,7 @@ export default function OrderHistory() {
             <Background />
 
             {/* Premium Header */}
-            <PageHeader title="PURCHASES" />
+            <PageHeader title="PURCHASES" subtitle="ORDER HISTORY" color="#f59e0b" />
 
             <main className="relative z-10 pt-28 px-6 space-y-8 md:space-y-10">
 
