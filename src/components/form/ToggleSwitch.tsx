@@ -37,11 +37,6 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, checked, onChange, c
                 className={`relative w-14 h-8 rounded-full transition-colors duration-300 flex items-center p-1
                             ${checked ? 'bg-primary' : 'bg-zinc-700'}`}
                 whileTap={{ scale: 0.95 }}
-            // REMOVE ...props FROM HERE
-            // If you explicitly want to pass 'disabled' or 'aria-label',
-            // declare them in ToggleSwitchProps and pass them individually:
-            // disabled={props.disabled}
-            // aria-label={props.ariaLabel || label}
             >
                 <motion.div
                     className="w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center"

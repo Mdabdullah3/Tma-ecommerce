@@ -7,7 +7,6 @@ import {
     List, Grid, TrendingUp, Sparkles, XCircle, CheckCircle, Layers, Bitcoin, Sliders, Eye,
     Backpack
 } from 'lucide-react';
-import WebApp from '@twa-dev/sdk'; // For haptic feedback
 import PageHeader from '@/components/PageHeader';
 import Background from '@/components/Background';
 import Link from 'next/link';
@@ -121,17 +120,10 @@ const ProductManager: React.FC = () => {
 
 
 
-    const handleEditProduct = (id: string) => {
-        WebApp.HapticFeedback.impactOccurred('medium');
-        alert(`ACCESSING NFT RECORD: ${id}`);
-    };
+
 
     const handleDeleteProduct = (id: string) => {
-        WebApp.HapticFeedback.notificationOccurred('error');
-        if (window.confirm(`CONFIRM DEACTIVATION OF NFT: ${id}?`)) {
-            setProducts(products.filter(p => p.id !== id));
-            WebApp.HapticFeedback.notificationOccurred('success');
-        }
+
     };
 
     const containerVariants = {
@@ -175,7 +167,7 @@ const ProductManager: React.FC = () => {
                     <h2 className="text-xs font-bold uppercase text-zinc-500 tracking-wider mb-3 px-2  pl-2">SYSTEM_METRICS</h2>
                     <div className="grid grid-cols-2 gap-3">
                         <motion.div variants={itemVariants} className="relative bg-[#1a1a2e]/60 border border-blue-800/20 rounded-2xl p-4 flex flex-col items-start shadow-xl backdrop-blur-lg overflow-hidden group">
-                            
+
                             <div className="flex items-center gap-2 text-blue-400 mb-2 relative z-10">
                                 <Layers size={16} strokeWidth={2} className="text-blue-500" />
                                 <span className="text-[8px] font-bold uppercase tracking-wider text-blue-300">TOTAL_NFTS</span>
@@ -300,14 +292,15 @@ const ProductManager: React.FC = () => {
                                         </p>
                                     </div>
                                     <div className="flex flex-col gap-2 relative z-10  duration-300 transform ">
-                                        <motion.button
-                                            whileTap={{ scale: 0.8 }}
-                                            onClick={() => handleEditProduct(product.id)}
-                                            className="p-2 bg-white/5 border border-white/10 rounded-full text-zinc-400 hover:text-white hover:bg-primary/80 transition-all shadow-md"
-                                            title="Edit Product"
-                                        >
-                                            <Edit size={16} />
-                                        </motion.button>
+                                        <Link href={`/admin/products/edit-product/${product.id}`}>
+                                            <motion.button
+                                                whileTap={{ scale: 0.8 }}
+                                                className="p-2 bg-white/5 border border-white/10 rounded-full text-zinc-400 hover:text-white hover:bg-primary/80 transition-all shadow-md"
+                                                title="Edit Product"
+                                            >
+                                                <Edit size={16} />
+                                            </motion.button>
+                                        </Link>
                                         <motion.button
                                             whileTap={{ scale: 0.8 }}
                                             onClick={() => handleDeleteProduct(product.id)}
