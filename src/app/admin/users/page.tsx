@@ -152,6 +152,8 @@ export default function AdminUsersPage() {
                         {filteredUsers.map((user, index) => (
                             <motion.div
                                 key={user.id}
+                                initial="hidden"
+                                animate="visible"
                                 variants={itemVariants}
                                 transition={{ delay: 0.05 * index }}
                                 className={`bg-[#0c0c0c]/50 border rounded-xl p-4 shadow-xl backdrop-blur-md relative overflow-hidden

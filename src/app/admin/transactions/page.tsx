@@ -95,7 +95,7 @@ export default function AdminTransactionsPage() {
             }
         }
     };
-
+    console.log(transactions);
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#01030d] to-[#04081c] text-white font-sans relative p-6 pb-24 overflow-hidden">
             <Background />
@@ -129,6 +129,8 @@ export default function AdminTransactionsPage() {
                         {transactions.map((tx, index) => (
                             <motion.div
                                 key={tx.id}
+                                initial="hidden"
+                                animate="visible"
                                 variants={itemVariants}
                                 transition={{ delay: 0.05 * index }}
                                 className="bg-[#0c0c0c]/50 border border-white/10 rounded-xl p-4 shadow-xl backdrop-blur-md relative overflow-hidden
@@ -166,5 +168,3 @@ export default function AdminTransactionsPage() {
         </div>
     );
 }
-
-// Ensure Loader2 is imported if used (e.g., from lucide-react)
