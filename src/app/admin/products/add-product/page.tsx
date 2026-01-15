@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
     Tag, DollarSign, Calendar, Upload, Layers, Sparkles, Link, MessageSquare
 } from 'lucide-react';
-import WebApp from '@twa-dev/sdk';
+// import WebApp from '@twa-dev/sdk'; // REMOVE THIS DIRECT IMPORT
+
 import PageHeader from '@/components/PageHeader';
 import FileUploadInput from '@/components/form/FileUploadInput';
 import TextInput from '@/components/form/TextInput';
@@ -44,7 +47,6 @@ const getTodayDate = () => {
     return `${year}-${month}-${day}`;
 };
 
-
 const ProductForm: React.FC = () => {
     const [formData, setFormData] = useState<FormData>({
         nftName: '',
@@ -59,8 +61,18 @@ const ProductForm: React.FC = () => {
     });
     const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
+    const [telegramWebApp, setTelegramWebApp] = useState<any>(null); // State to hold the WebApp instance
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    // Dynamically import WebApp SDK on client-side
+    useEffect(() => {
+        if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
+            setTelegramWebApp(window.Telegram.WebApp);
+        }
+    }, []);
+
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    ) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
         // Clear error when user starts typing/selecting
@@ -68,6 +80,7 @@ const ProductForm: React.FC = () => {
             setErrors(prev => ({ ...prev, [name as keyof FormData]: undefined }));
         }
     };
+
 
     const handleFileChange = (file: File | null) => {
         setFormData(prev => ({ ...prev, imageUrl: file }));
@@ -98,10 +111,14 @@ const ProductForm: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        WebApp.HapticFeedback.impactOccurred('heavy');
+        if (telegramWebApp) { // Check if WebApp is available before using it
+            telegramWebApp.HapticFeedback.impactOccurred('heavy');
+        }
 
         if (!validateForm()) {
-            WebApp.HapticFeedback.notificationOccurred('error');
+            if (telegramWebApp) { // Check if WebApp is available
+                telegramWebApp.HapticFeedback.notificationOccurred('error');
+            }
             return;
         }
 
@@ -112,21 +129,21 @@ const ProductForm: React.FC = () => {
         await new Promise(resolve => setTimeout(resolve, 2000));
 
         setIsLoading(false);
-        WebApp.HapticFeedback.notificationOccurred('success');
+        if (telegramWebApp) { // Check if WebApp is available
+            telegramWebApp.HapticFeedback.notificationOccurred('success');
+        }
         alert("NFT Successfully Deployed to Network!");
         // Reset form or navigate away
     };
 
     const formVariants = {
         hidden: { opacity: 0 },
-
         visible: {
             opacity: 1,
             transition: {
                 staggerChildren: 0.07,
                 delayChildren: 0.1
             }
-
         }
     };
 
@@ -154,7 +171,7 @@ const ProductForm: React.FC = () => {
                 initial="hidden"
                 animate="visible"
                 variants={formVariants}
-                className="relative z-10 pt-20 space-y-7" 
+                className="relative z-10 pt-20 space-y-7"
             >
                 {/* NFT Image Upload */}
                 <motion.div variants={fieldVariants}>
@@ -270,7 +287,7 @@ const ProductForm: React.FC = () => {
                 </motion.div>
 
                 {/* Submit Button */}
-                <motion.div variants={fieldVariants} className="pt-4"> {/* Added padding top for separation */}
+                <motion.div variants={fieldVariants} className="pt-4">
                     <PrimaryButton
                         label="DEPLOY_NFT_TO_NETWORK"
                         icon={Upload}

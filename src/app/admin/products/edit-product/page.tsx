@@ -1,12 +1,11 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-// components/EditProductForm.tsx
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
     Save, Undo2,
 } from 'lucide-react';
-import WebApp from '@twa-dev/sdk';
+
 import PageHeader from '@/components/PageHeader';
 import FileUploadInput from '@/components/form/FileUploadInput';
 import TextInput from '@/components/form/TextInput';
@@ -14,21 +13,21 @@ import SelectInput from '@/components/form/SelectInput';
 import NumberInput from '@/components/form/NumberInput';
 import ToggleSwitch from '@/components/form/ToggleSwitch';
 import PrimaryButton from '@/components/form/PrimaryButton';
+import Background from '@/components/Background';
 
-// Assuming this interface is also defined in ProductManager or a shared types file
 interface NFTProduct {
     id: string;
     name: string;
-    description: string; // Added description for edit form
-    image: string; // URL to the NFT image (will be the initial currentFile for FileUploadInput)
+    description: string;
+    image: string; // URL to the NFT image
     category: string;
     priceTon: number;
-    royalty: number; // Added royalty for edit form
+    royalty: number;
     status: 'listed' | 'draft' | 'sold';
     views: number;
     mintDate: string;
-    isListed?: boolean | undefined; // For form toggle
-    contractAddress: string; // Added contract address for edit form
+    isListed?: boolean; // For form toggle
+    contractAddress: string;
 }
 
 // Dummy initial data for an NFT being edited
@@ -36,7 +35,7 @@ const dummyInitialProduct: NFTProduct = {
     id: 'nft002',
     name: 'AETHERIAL BLOSSOM V2.0',
     description: 'A vibrant, generative art piece capturing the essence of digital flora. Each bloom is unique, minted on the TON blockchain.',
-    image: 'https://cdn-icons-png.flaticon.com/512/3655/3655113.png',
+    image: 'https://cdn-icons-png.flaticon.com/512/3655/3655113.png', // Example image URL
     category: 'ART',
     priceTon: 8.2,
     royalty: 7,
@@ -57,47 +56,61 @@ const NFT_CATEGORIES = [
 
 interface EditProductFormProps {
     initialProduct?: NFTProduct;
-    onGoBack?: () => void; // Optional callback to go back to product list
+    onGoBack?: () => void;
     onProductUpdated?: (updatedProduct: NFTProduct) => void;
 }
 
 const EditProductForm: React.FC<EditProductFormProps> = ({ initialProduct = dummyInitialProduct, onGoBack, onProductUpdated }) => {
-    const [formData, setFormData] = useState<Omit<NFTProduct, 'id' | 'views'> & { imageUrl: File | string | null }>({
-        ...initialProduct,
+    // State to manage form data, including a new `imageUrl` which can be File or string
+    const [formData, setFormData] = useState<Omit<NFTProduct, 'id' | 'views' | 'image' | 'status'> & { imageUrl: File | string | null; isListed: boolean }>(() => ({
+        // Initialize state directly from initialProduct
         name: initialProduct.name,
         description: initialProduct.description,
         category: initialProduct.category,
         priceTon: initialProduct.priceTon,
         royalty: initialProduct.royalty,
-        imageUrl: initialProduct.image, // Initialize with existing image URL
+        imageUrl: initialProduct.image, // URL or File
         mintDate: initialProduct.mintDate,
-        isListed: initialProduct.status === 'listed', // Convert status to boolean
+        isListed: initialProduct.status === 'listed', // Convert status to boolean for toggle
         contractAddress: initialProduct.contractAddress,
-    });
+    }));
+
     const [errors, setErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
+    const [telegramWebApp, setTelegramWebApp] = useState<any>(null); // State to hold the WebApp instance
 
-    // This useEffect ensures the form updates if initialProduct changes (e.g., if navigating to edit different product)
+    // Effect to dynamically load Telegram WebApp SDK
     useEffect(() => {
-        setFormData({
-            ...formData,
-            name: initialProduct.name,
-            description: initialProduct.description,
-            category: initialProduct.category,
-            priceTon: initialProduct.priceTon,
-            royalty: initialProduct.royalty,
-            imageUrl: initialProduct.image,
-            mintDate: initialProduct.mintDate,
-            isListed: initialProduct.status === 'listed',
-            contractAddress: initialProduct.contractAddress,
-        });
-        setErrors({}); // Clear errors on product change
-    }, [initialProduct]);
+        if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
+            setTelegramWebApp(window.Telegram.WebApp);
+        }
+    }, []);
+
+    // Effect to reset form data when `initialProduct` prop changes
+    // This is crucial for editing different products without stale data
+    useEffect(() => {
+        // Only update if initialProduct.id is different, or if it's the first load
+        if (initialProduct) {
+            setFormData({
+                name: initialProduct.name,
+                description: initialProduct.description,
+                category: initialProduct.category,
+                priceTon: initialProduct.priceTon,
+                royalty: initialProduct.royalty,
+                imageUrl: initialProduct.image,
+                mintDate: initialProduct.mintDate,
+                isListed: initialProduct.status === 'listed',
+                contractAddress: initialProduct.contractAddress,
+            });
+            setErrors({}); // Clear errors when a new product is loaded
+        }
+    }, [initialProduct.id]); // Depend only on initialProduct.id for re-initialization
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+        const { name, value } = e.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement; // Type assertion
         setFormData(prev => ({ ...prev, [name]: value }));
+        // Clear error when user starts typing/selecting
         if (errors[name as keyof typeof formData]) {
             setErrors(prev => ({ ...prev, [name as keyof typeof formData]: undefined }));
         }
@@ -131,38 +144,74 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ initialProduct = dumm
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        WebApp.HapticFeedback.impactOccurred('heavy');
+        if (telegramWebApp) { // Use conditionally
+            telegramWebApp.HapticFeedback.impactOccurred('heavy');
+        }
 
         if (!validateForm()) {
-            WebApp.HapticFeedback.notificationOccurred('error');
+            if (telegramWebApp) { // Use conditionally
+                telegramWebApp.HapticFeedback.notificationOccurred('error');
+            }
             return;
         }
 
         setIsLoading(true);
         console.log("Updating NFT Data:", formData);
+        let uploadedImageUrl = formData.imageUrl;
+        if (formData.imageUrl instanceof File) {
+            console.log("Uploading new image file...");           
+            uploadedImageUrl = 'https://example.com/new_uploaded_image.png'; // Placeholder for demo
+        }
 
-        // Simulate API call to update product
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        try {
+            // const apiResponse = await fetch('/api/nfts/${initialProduct.id}', {
+            //     method: 'PUT',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({
+            //         ...formData,
+            //         image: uploadedImageUrl,
+            //         status: formData.isListed ? 'listed' : 'draft',
+            //     }),
+            // });
+            // if (!apiResponse.ok) {
+            //     throw new Error('Failed to update NFT.');
+            // }
+            // const result = await apiResponse.json();
+            // console.log('API Response:', result);
 
-        setIsLoading(false);
-        WebApp.HapticFeedback.notificationOccurred('success');
-        alert("NFT Record Successfully Updated!");
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1500)); // Shorter for better UX
 
-        // Construct the updated product object for callback
-        const updatedProduct: NFTProduct = {
-            ...initialProduct, // Keep original id and views
-            name: formData.name,
-            description: formData.description,
-            image: typeof formData.imageUrl === 'string' ? formData.imageUrl : 'UPLOADED_NEW_IMAGE_URL_HERE', // Simplified for demo
-            category: formData.category,
-            priceTon: formData.priceTon,
-            royalty: formData.royalty,
-            mintDate: formData.mintDate,
-            status: formData.isListed ? 'listed' : 'draft', // Convert boolean back to status
-            contractAddress: formData.contractAddress,
-        };
-        onProductUpdated?.(updatedProduct); // Notify parent of update
-        onGoBack?.(); // Go back to list after update
+            if (telegramWebApp) { // Use conditionally
+                telegramWebApp.HapticFeedback.notificationOccurred('success');
+            }
+            alert("NFT Record Successfully Updated!");
+
+            // Construct the updated product object for callback
+            const updatedProduct: NFTProduct = {
+                ...initialProduct, // Keep original id and views
+                name: formData.name,
+                description: formData.description,
+                image: uploadedImageUrl as string, // Ensure it's a string URL here
+                category: formData.category,
+                priceTon: formData.priceTon,
+                royalty: formData.royalty,
+                mintDate: formData.mintDate,
+                status: formData.isListed ? 'listed' : 'draft', // Convert boolean back to status
+                contractAddress: formData.contractAddress,
+            };
+            onProductUpdated?.(updatedProduct); // Notify parent of update
+            onGoBack?.(); // Go back to list after update
+
+        } catch (error) {
+            console.error("Error updating NFT:", error);
+            if (telegramWebApp) { // Use conditionally
+                telegramWebApp.HapticFeedback.notificationOccurred('error');
+            }
+            alert("Failed to update NFT. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const formVariants = {
@@ -193,15 +242,8 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ initialProduct = dumm
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#000000] to-[#0a101f] text-white font-sans relative p-6 pb-24 overflow-hidden">
-            {/* Background elements */}
-            <div className="absolute inset-0 z-0 opacity-20">
-                <div className="absolute inset-0 bg-radial-gradient animate-pulse-bg" />
-                <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] bg-repeat opacity-[0.02] transform-gpu animate-pan-grid" />
-                <div className="absolute top-[10%] left-[5%] w-96 h-96 bg-fuchsia-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob" style={{ animationDelay: '0s' }} />
-                <div className="absolute bottom-[20%] right-[10%] w-80 h-80 bg-cyan-500 rounded-full mix-blend-screen filter blur-3xl opacity-10 animate-blob" style={{ animationDelay: '-4s' }} />
-            </div>
-            <div className="absolute inset-0 z-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none" />
-
+           
+            <Background />
             <PageHeader title={`EDIT_NFT_RECORD`} />
 
             <motion.form
@@ -237,7 +279,7 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ initialProduct = dumm
 
                 {/* Description */}
                 <motion.div variants={fieldVariants}>
-                    <TextInput // Consider a custom TextArea for longer descriptions if needed
+                    <TextInput
                         label="DESCRIPTION"
                         name="description"
                         value={formData.description}
@@ -319,7 +361,7 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ initialProduct = dumm
                     <ToggleSwitch
                         label="CURRENTLY_LISTED_ON_MARKET"
                         name="isListed"
-                        checked={formData.isListed ?? false}
+                        checked={formData.isListed} // No need for ?? false if always boolean
                         onChange={(checked) => handleToggleChange('isListed', checked)}
                     />
                 </motion.div>
@@ -330,7 +372,7 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ initialProduct = dumm
                         label="CANCEL_EDIT"
                         icon={Undo2}
                         type="button"
-                        onClick={onGoBack} // Go back without saving
+                        onClick={onGoBack}
                         className="!bg-zinc-700 !shadow-zinc-900/40 hover:!bg-zinc-600 active:!bg-zinc-800"
                     />
                     <PrimaryButton

@@ -3,7 +3,7 @@
 "use client";
 import React, { InputHTMLAttributes, useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Image, Upload, X, AlertCircle } from 'lucide-react';
+import { Upload, X, AlertCircle } from 'lucide-react'; 
 
 interface FileUploadInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
     label: string;
@@ -19,24 +19,33 @@ const FileUploadInput: React.FC<FileUploadInputProps> = ({ label, onFileChange, 
     const hasError = !!errorMessage;
 
     useEffect(() => {
+        // Clear previous object URL if any
+        return () => {
+            if (previewUrl && previewUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(previewUrl);
+            }
+        };
+    }, [previewUrl]); // Cleanup effect for object URLs
+
+    useEffect(() => {
         if (currentFile instanceof File) {
             setFileName(currentFile.name);
-            setPreviewUrl(URL.createObjectURL(currentFile));
+            setPreviewUrl(URL.createObjectURL(currentFile)); // Create object URL for File
         } else if (typeof currentFile === 'string' && currentFile) {
             setFileName(currentFile.split('/').pop() || 'Existing File');
-            setPreviewUrl(currentFile);
+            setPreviewUrl(currentFile); // Use URL directly for string
         } else {
             setFileName(null);
             setPreviewUrl(null);
         }
-    }, [currentFile]);
+    }, [currentFile]); // Depend on currentFile to update when the prop changes
 
 
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files ? event.target.files[0] : null;
         if (file) {
             setFileName(file.name);
-            setPreviewUrl(URL.createObjectURL(file));
+            setPreviewUrl(URL.createObjectURL(file)); // Create object URL for new File
             onFileChange(file);
         } else {
             setFileName(null);
@@ -46,12 +55,16 @@ const FileUploadInput: React.FC<FileUploadInputProps> = ({ label, onFileChange, 
     };
 
     const handleClearFile = (e: React.MouseEvent) => {
-        e.stopPropagation(); // Prevent opening file dialog
-        e.preventDefault();
+        e.stopPropagation(); // Crucial: Prevent the div's onClick from firing
+        e.preventDefault(); // Prevent default button behavior if this was a button
+
         if (fileInputRef.current) {
-            fileInputRef.current.value = ''; // Clear the input value
+            fileInputRef.current.value = ''; // Clear the input value so same file can be selected again
         }
         setFileName(null);
+        if (previewUrl && previewUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(previewUrl); // Revoke object URL on clear
+        }
         setPreviewUrl(null);
         onFileChange(null);
     };
@@ -69,19 +82,18 @@ const FileUploadInput: React.FC<FileUploadInputProps> = ({ label, onFileChange, 
             >
                 {label}
             </label>
-            <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className={`relative flex items-center w-full bg-[#1a1a2e]/70 rounded-xl border-2 pr-4 pl-10 py-3 text-sm transition-all duration-200 min-h-[56px]
+            {/* The main clickable area is now a DIV, not a button */}
+            <div
+                onClick={() => fileInputRef.current?.click()} // This div triggers the file input
+                className={`relative flex items-center w-full bg-[#1a1a2e]/70 rounded-xl border-2 pr-4 pl-10 py-3 text-sm transition-all duration-200 min-h-[56px] cursor-pointer
                             ${hasError ? 'border-rose-600 shadow-lg shadow-rose-900/30' :
                         'border-white/10 group-hover:border-white/20'}`}
             >
-                
                 <input
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileSelect}
-                    className="hidden"
+                    className="hidden" // Keep the actual input hidden
                     {...props}
                 />
                 <span className="text-white font-mono tracking-wide grow text-left overflow-hidden whitespace-nowrap text-ellipsis mr-8">
@@ -99,7 +111,9 @@ const FileUploadInput: React.FC<FileUploadInputProps> = ({ label, onFileChange, 
                             className="flex items-center gap-2"
                         >
                             <img src={previewUrl} alt="Preview" className="w-8 h-8 object-contain rounded mr-2" />
+                            {/* This is now a valid nested button */}
                             <motion.button
+                                type="button" // Explicitly declare type for accessibility
                                 whileTap={{ scale: 0.8 }}
                                 onClick={handleClearFile}
                                 className="text-zinc-500 hover:text-rose-500 transition-colors"
@@ -120,7 +134,7 @@ const FileUploadInput: React.FC<FileUploadInputProps> = ({ label, onFileChange, 
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </button>
+            </div> {/* End of the main clickable div */}
             <AnimatePresence>
                 {hasError && (
                     <motion.p
