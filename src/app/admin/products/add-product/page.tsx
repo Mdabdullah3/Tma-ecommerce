@@ -154,7 +154,7 @@ const ProductForm: React.FC = () => {
                 initial="hidden"
                 animate="visible"
                 variants={formVariants}
-                className="relative z-10 pt-28 space-y-7" 
+                className="relative z-10 pt-20 space-y-7" 
             >
                 {/* NFT Image Upload */}
                 <motion.div variants={fieldVariants}>
@@ -210,7 +210,6 @@ const ProductForm: React.FC = () => {
                     <NumberInput
                         label="PRICE (TON)"
                         name="priceTon"
-                        icon={DollarSign}
                         value={formData.priceTon === 0 ? '' : formData.priceTon} // Show empty if 0 for better UX
                         onChange={handleChange}
                         step="0.1"
@@ -225,7 +224,6 @@ const ProductForm: React.FC = () => {
                     <NumberInput
                         label="ROYALTY (%)"
                         name="royalty"
-                        icon={Tag}
                         value={formData.royalty}
                         onChange={handleChange}
                         step="1"

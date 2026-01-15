@@ -168,7 +168,7 @@ const ProductManager: React.FC = () => {
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}
-                className="relative z-10 pt-10 space-y-4"
+                className="relative z-10 pt-16 space-y-4"
             >
                 {/* Product Summary Cards - More "data-rich" design */}
                 <motion.section variants={itemVariants} className="w-full">

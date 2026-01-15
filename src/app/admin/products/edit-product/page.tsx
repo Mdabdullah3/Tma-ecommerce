@@ -2,10 +2,9 @@
 // components/EditProductForm.tsx
 "use client";
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-    Image, Tag, DollarSign, Calendar, Upload, Layers, List, Eye, Sparkles, Plus, CheckCircle,
-    FileText, Link, Shield, MessageSquare, Save, Undo2,
+    Save, Undo2,
 } from 'lucide-react';
 import WebApp from '@twa-dev/sdk';
 import PageHeader from '@/components/PageHeader';
@@ -320,7 +319,7 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ initialProduct = dumm
                     <ToggleSwitch
                         label="CURRENTLY_LISTED_ON_MARKET"
                         name="isListed"
-                        checked={formData.isListed}
+                        checked={formData.isListed ?? false}
                         onChange={(checked) => handleToggleChange('isListed', checked)}
                     />
                 </motion.div>
