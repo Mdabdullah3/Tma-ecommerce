@@ -25,9 +25,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
     const adminMenuItems = [
         { id: 'productmanagment', name: 'Products_Management', icon: ShoppingBag, color: '#f59e0b', href: '/admin/products' },
         { id: 'userDirectory', name: 'USER_DIRECTORY', icon: Users, color: '#2563eb', href: '/admin/users' },
-        { id: 'transactionLog', name: 'TRANSACTION_LOGS', icon: ShoppingBag, color: '#eab308', href: '/admin/transactions' },
-        { id: 'systemConfig', name: 'SYSTEM_CONFIG', icon: Settings, color: '#9333ea', href: '/admin/config' },
-        { id: 'securityAudit', name: 'SECURITY_AUDIT', icon: Lock, color: '#ef4444', href: '/admin/security' },
+        { id: 'transactionLog', name: 'Order_Transactions', icon: ShoppingBag, color: '#eab308', href: '/admin/transactions' },
     ];
 
     const containerVariants = {
