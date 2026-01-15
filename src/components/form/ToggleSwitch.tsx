@@ -8,9 +8,18 @@ interface ToggleSwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
     label: string;
     checked: boolean;
     onChange: (checked: boolean) => void;
+    // If you need to pass specific HTML attributes to the button,
+    // define them here explicitly, e.g.:
+    // disabled?: boolean;
+    // ariaLabel?: string;
+    // id?: string;
 }
 
 const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, checked, onChange, className, ...props }) => {
+    // You can still use `props` for the hidden input if you had one,
+    // but not for the button that handles the toggle logic.
+    // In this component, it seems `props` are not used for anything else.
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -22,11 +31,17 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, checked, onChange, c
             <span className="text-sm font-bold uppercase text-white tracking-wide">{label}</span>
             <motion.button
                 type="button"
+                role="switch" // Add ARIA role for accessibility
+                aria-checked={checked} // Indicate checked state for screen readers
                 onClick={() => onChange(!checked)}
                 className={`relative w-14 h-8 rounded-full transition-colors duration-300 flex items-center p-1
                             ${checked ? 'bg-primary' : 'bg-zinc-700'}`}
                 whileTap={{ scale: 0.95 }}
-                {...props}
+            // REMOVE ...props FROM HERE
+            // If you explicitly want to pass 'disabled' or 'aria-label',
+            // declare them in ToggleSwitchProps and pass them individually:
+            // disabled={props.disabled}
+            // aria-label={props.ariaLabel || label}
             >
                 <motion.div
                     className="w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center"

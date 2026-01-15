@@ -50,7 +50,7 @@ export default function EliteProfile() {
                 <section className="flex flex-col items-center">
                     <div className="relative w-24 h-24 mb-3 group">
                         <div className="absolute inset-0 bg-amber-500/10 blur-[50px] animate-pulse" />
-                        <div className="relative w-full h-full rounded-[45px] p-[2px] bg-gradient-to-b from-white/20 to-transparent shadow-2xl">
+                        <div className="relative w-full h-full rounded-[45px] p-[2px] bg-linear-to-b from-white/20 to-transparent shadow-2xl">
                             <div className="w-full h-full rounded-[43px] bg-zinc-950 overflow-hidden border border-black flex items-center justify-center">
                                 {user.photo ? <img src={user.photo} className="w-full h-full object-cover grayscale" /> : <Fingerprint size={48} className="text-white/10" />}
                             </div>

@@ -30,7 +30,7 @@ const SecurityGateModal: React.FC<SecurityGateModalProps> = ({ onClose, onAdminA
     };
 
     const handleAccessAttempt = () => {
-        if (password === 'ADMIN_PASS_123') { // Replace with a more secure check in production
+        if (password === '1234') { // Replace with a more secure check in production
             if (telegramWebApp) { // Use conditionally
                 telegramWebApp.HapticFeedback.notificationOccurred('success');
             }

@@ -361,7 +361,7 @@ const EditProductForm: React.FC<EditProductFormProps> = ({ initialProduct = dumm
                     <ToggleSwitch
                         label="CURRENTLY_LISTED_ON_MARKET"
                         name="isListed"
-                        checked={formData.isListed} // No need for ?? false if always boolean
+                        checked={formData.isListed}
                         onChange={(checked) => handleToggleChange('isListed', checked)}
                     />
                 </motion.div>
