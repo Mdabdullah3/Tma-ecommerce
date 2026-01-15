@@ -1,58 +1,61 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
-
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import WebApp from '@twa-dev/sdk';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Shield, Wallet } from 'lucide-react';
 import Link from 'next/link';
+import { useUserStore } from '@/app/store/userStore';
 
 export default function SovereignHeader() {
     const [user, setUser] = useState({ name: "DIRECTOR_01", photo: "" });
     const [status, setStatus] = useState<'idle' | 'active'>('idle');
+    const registerUser = useUserStore((state) => state.registerUser);
+    const hasRegistered = useRef(false);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
             WebApp.ready();
             WebApp.expand();
-            WebApp.setHeaderColor('#000000');
-            const tg = WebApp.initDataUnsafe?.user;
-            if (tg) {
-                // eslint-disable-next-line react-hooks/set-state-in-effect
+            const tgUser = WebApp.initDataUnsafe?.user;
+            if (tgUser) {
                 setUser({
-                    name: tg.first_name.toUpperCase(),
-                    photo: tg.photo_url || ""
+                    name: tgUser.first_name.toUpperCase(),
+                    photo: tgUser.photo_url || ""
                 });
+                if (!hasRegistered.current) {
+                    registerUser(tgUser);
+                    hasRegistered.current = true;
+                }
             }
         }
-    }, []);
+    }, [registerUser]);
 
     return (
         <motion.header
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed top-0 inset-x-0 z-100 px-6 pt-6 pb-2"
+            className="fixed top-0 inset-x-0 z-[100] px-6 pt-6 pb-2" // Increased z-index to 100
         >
-            {/* 1. LAYERED DEPTH: Glassmorphism Background */}
-            <div className="absolute inset-x-4 top-4 bottom-0 bg-white/3 backdrop-blur-2xl rounded-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]" />
+            {/* Glassmorphism Background */}
+            <div className="absolute inset-x-4 top-4 bottom-0 bg-white/5 backdrop-blur-2xl rounded-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]" />
 
             <div className="relative z-10 flex items-center justify-between px-2">
-
                 {/* --- LEFT: IDENTITY SECTION --- */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                     <div className="relative group">
-                        {/* Animated Aura */}
                         <motion.div
-                            animate={{ opacity: [0.2, 0.5, 0.2] }}
+                            animate={{ opacity: [0.2, 0.4, 0.2] }}
                             transition={{ duration: 3, repeat: Infinity }}
-                            className="absolute -inset-2 bg-linear-to-tr from-primary to-transparent blur-xl rounded-full"
+                            className="absolute -inset-2 bg-blue-500/20 blur-xl rounded-full"
                         />
-                        <div className="relative w-11 h-11 rounded-full overflow-hidden border-[0.5px] border-white/30 p-[2px]">
-                            <Link href="/profile" className="w-full h-full rounded-full overflow-hidden bg-primary shadow-inner">
+                        <div className="relative w-11 h-11 rounded-full overflow-hidden border border-white/20 p-[1px] bg-zinc-900">
+                            <Link href="/profile" className="w-full h-full rounded-full overflow-hidden block">
                                 {user.photo ? (
-                                    <img src={user.photo} className="w-full h-full object-cover scale-110 grayscale" alt="U" />
+                                    <img src={user.photo} className="w-full h-full object-cover" alt="Profile" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center">
-                                        <User size={16} className="text-zinc-100" />
+                                    <div className="w-full h-full flex items-center justify-center bg-zinc-800 text-white">
+                                        <User size={18} />
                                     </div>
                                 )}
                             </Link>
@@ -60,8 +63,8 @@ export default function SovereignHeader() {
                     </div>
 
                     <div className="flex flex-col">
-                        <span className="text-[10px] font-medium tracking-tight text-zinc-200 mb-0.5">Welcome to Swift</span>
-                        <h2 className="text-xs font-bold tracking-widest text-white/90">
+                        <span className="text-[10px] font-medium tracking-tight text-zinc-400 mb-0.5">Welcome to Swift</span>
+                        <h2 className="text-xs font-black tracking-widest text-white truncate max-w-[120px]">
                             {user.name}
                         </h2>
                     </div>
@@ -71,18 +74,18 @@ export default function SovereignHeader() {
                 <motion.button
                     whileTap={{ scale: 0.96 }}
                     onClick={() => setStatus(status === 'idle' ? 'active' : 'idle')}
-                    className={`group relative flex items-center gap-3 pl-4 pr-5 py-2.5 rounded-full overflow-hidden border transition-all duration-500 
+                    className={`group relative flex items-center gap-3 pl-4 pr-5 py-2.5 rounded-full border transition-all duration-500 
                         ${status === 'active'
                             ? 'bg-white text-black border-white'
-                            : 'bg-primary text-white border-white/10 hover:border-white/30'}`}
+                            : 'bg-transparent text-white border-white/20 hover:border-white/40'}`}
                 >
                     <AnimatePresence mode="wait">
                         {status === 'active' ? (
                             <motion.div
                                 key="active"
-                                initial={{ y: 20, opacity: 0 }}
+                                initial={{ y: 10, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
-                                exit={{ y: -20, opacity: 0 }}
+                                exit={{ y: -10, opacity: 0 }}
                                 className="flex items-center gap-2"
                             >
                                 <Shield size={12} strokeWidth={3} />
@@ -91,12 +94,12 @@ export default function SovereignHeader() {
                         ) : (
                             <motion.div
                                 key="idle"
-                                initial={{ y: 20, opacity: 0 }}
+                                initial={{ y: 10, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
-                                exit={{ y: -20, opacity: 0 }}
+                                exit={{ y: -10, opacity: 0 }}
                                 className="flex items-center gap-2"
                             >
-                                <Wallet size={12} className="text-zinc-100 group-hover:text-white transition-colors" />
+                                <Wallet size={12} />
                                 <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Connect</span>
                             </motion.div>
                         )}
