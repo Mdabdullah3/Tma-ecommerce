@@ -1,302 +1,203 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import {
-    Tag, DollarSign, Calendar, Upload, Layers, Sparkles, Link, MessageSquare
+    Upload, Sparkles, Link as LinkIcon, Eye,
+    ShieldCheck, Zap, Globe, Info
 } from 'lucide-react';
-// import WebApp from '@twa-dev/sdk'; // REMOVE THIS DIRECT IMPORT
 
 import PageHeader from '@/components/PageHeader';
-import FileUploadInput from '@/components/form/FileUploadInput';
 import TextInput from '@/components/form/TextInput';
 import SelectInput from '@/components/form/SelectInput';
 import NumberInput from '@/components/form/NumberInput';
-import ToggleSwitch from '@/components/form/ToggleSwitch';
 import PrimaryButton from '@/components/form/PrimaryButton';
 import Background from '@/components/Background';
+import { useProductStore } from '@/app/store/useProductStore';
+import ToggleSwitch from '@/components/form/ToggleSwitch';
 
-interface FormData {
-    nftName: string;
-    description: string;
-    category: string;
-    priceTon: number;
-    royalty: number;
-    imageUrl: File | null;
-    mintDate: string;
-    isListed: boolean;
-    contractAddress: string;
-}
-
+// Constants
 const NFT_CATEGORIES = [
     { value: 'COLLECTIBLE', label: 'COLLECTIBLE' },
     { value: 'ART', label: 'ART' },
     { value: 'UTILITY', label: 'UTILITY' },
     { value: 'GAMING', label: 'GAMING' },
-    { value: 'METAVERSE', label: 'METAVERSE' },
-    { value: 'MUSIC', label: 'MUSIC' },
 ];
 
-// Helper to get today's date in YYYY-MM-DD format
-const getTodayDate = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-};
-
 const ProductForm: React.FC = () => {
-    const [formData, setFormData] = useState<FormData>({
+    const router = useRouter();
+    const addProduct = useProductStore((state) => state.addProduct);
+
+    const [formData, setFormData] = useState({
         nftName: '',
         description: '',
-        category: '',
+        category: 'COLLECTIBLE',
         priceTon: 0,
-        royalty: 5, // Default royalty
-        imageUrl: null,
-        mintDate: getTodayDate(),
-        isListed: false,
+        imageUrl: '',
         contractAddress: '',
+        isListed: true,
     });
-    const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
-    const [isLoading, setIsLoading] = useState(false);
-    const [telegramWebApp, setTelegramWebApp] = useState<any>(null); // State to hold the WebApp instance
 
-    // Dynamically import WebApp SDK on client-side
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [isLoading, setIsLoading] = useState(false);
+    const [telegramWebApp, setTelegramWebApp] = useState<any>(null);
+
     useEffect(() => {
-        if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
+        if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
             setTelegramWebApp(window.Telegram.WebApp);
         }
     }, []);
 
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-    ) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear error when user starts typing/selecting
-        if (errors[name as keyof FormData]) {
-            setErrors(prev => ({ ...prev, [name as keyof FormData]: undefined }));
-        }
-    };
-
-
-    const handleFileChange = (file: File | null) => {
-        setFormData(prev => ({ ...prev, imageUrl: file }));
-        if (errors.imageUrl) {
-            setErrors(prev => ({ ...prev, imageUrl: undefined }));
-        }
-    };
-
-    const handleToggleChange = (name: keyof FormData, checked: boolean) => {
-        setFormData(prev => ({ ...prev, [name]: checked }));
-    };
-
-
-    const validateForm = () => {
-        const newErrors: Partial<Record<keyof FormData, string>> = {};
-        if (!formData.nftName.trim()) newErrors.nftName = 'NFT Name is required.';
-        if (formData.nftName.trim().length < 3) newErrors.nftName = 'Name must be at least 3 characters.';
-        if (!formData.description.trim()) newErrors.description = 'Description is required.';
-        if (!formData.category) newErrors.category = 'Category is required.';
-        if (formData.priceTon <= 0) newErrors.priceTon = 'Price must be greater than 0.';
-        if (!formData.imageUrl) newErrors.imageUrl = 'NFT Image is required.';
-        if (!formData.contractAddress.trim()) newErrors.contractAddress = 'Contract Address is required.';
-        if (formData.contractAddress.trim().length < 10) newErrors.contractAddress = 'Invalid Contract Address.';
+    const validate = () => {
+        const newErrors: Record<string, string> = {};
+        if (!formData.nftName) newErrors.nftName = "REQUIRED_FIELD";
+        if (!formData.imageUrl.startsWith('http')) newErrors.imageUrl = "INVALID_URL_PROTOCOL";
+        if (!formData.contractAddress) newErrors.contractAddress = "ADDRESS_MISSING";
+        if (formData.priceTon <= 0) newErrors.priceTon = "INVALID_PRICE";
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (telegramWebApp) { // Check if WebApp is available before using it
-            telegramWebApp.HapticFeedback.impactOccurred('heavy');
-        }
-
-        if (!validateForm()) {
-            if (telegramWebApp) { // Check if WebApp is available
-                telegramWebApp.HapticFeedback.notificationOccurred('error');
-            }
+        if (!validate()) {
+            telegramWebApp?.HapticFeedback.notificationOccurred('error');
             return;
         }
 
         setIsLoading(true);
-        console.log("Submitting NFT Data:", formData);
+        telegramWebApp?.HapticFeedback.impactOccurred('medium');
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        try {
+            await addProduct({
+                productId: `NFT-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+                name: formData.nftName,
+                image: formData.imageUrl,
+                category: formData.category,
+                priceTon: Number(formData.priceTon),
+                status: formData.isListed ? 'listed' : 'draft',
+                views: 0,
+                mintDate: new Date().toISOString()
+            });
 
-        setIsLoading(false);
-        if (telegramWebApp) { // Check if WebApp is available
-            telegramWebApp.HapticFeedback.notificationOccurred('success');
-        }
-        alert("NFT Successfully Deployed to Network!");
-        // Reset form or navigate away
-    };
-
-    const formVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.07,
-                delayChildren: 0.1
-            }
-        }
-    };
-
-    const fieldVariants = {
-        hidden: { y: 20, opacity: 0, scale: 0.98 },
-        visible: {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            transition: {
-                type: "spring" as const,
-                stiffness: 150,
-                damping: 15,
-                mass: 0.8
-            }
+            telegramWebApp?.HapticFeedback.notificationOccurred('success');
+            router.push('/admin/products');
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-[#000000] to-[#0a101f] text-white font-sans relative p-6 pb-24 overflow-hidden">
+        <div className="min-h-screen bg-black text-white relative p-6 pb-32">
             <Background />
-            <PageHeader title="DEPLOY_NFT" />
-            <motion.form
-                onSubmit={handleSubmit}
-                initial="hidden"
-                animate="visible"
-                variants={formVariants}
-                className="relative z-10 pt-20 space-y-7"
-            >
-                {/* NFT Image Upload */}
-                <motion.div variants={fieldVariants}>
-                    <FileUploadInput
-                        label="NFT_IMAGE_FILE"
-                        name="imageUrl"
-                        accept="image/*"
-                        onFileChange={handleFileChange}
-                        currentFile={formData.imageUrl}
-                        errorMessage={errors.imageUrl}
-                    />
+            <PageHeader title="MINT_STATION" />
+
+            <div className="relative z-10 pt-20 max-w-2xl mx-auto">
+                {/* LIVE PREVIEW CARD */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-8 rounded-3xl overflow-hidden border border-white/10 bg-gradient-to-b from-zinc-900 to-black shadow-2xl"
+                >
+                    <div className="aspect-square w-full relative bg-zinc-900 flex items-center justify-center group">
+                        {formData.imageUrl ? (
+                            <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                        ) : (
+                            <div className="text-zinc-700 flex flex-col items-center gap-2">
+                                <Sparkles size={48} className="animate-pulse" />
+                                <span className="text-[10px] font-black tracking-[0.2em]">AWAITING_ASSET_URL</span>
+                            </div>
+                        )}
+                        <div className="absolute bottom-4 left-4 right-4 backdrop-blur-md bg-black/40 p-4 rounded-2xl border border-white/5">
+                            <p className="text-[10px] text-blue-400 font-bold mb-1 tracking-widest uppercase">{formData.category || "CATEGORY"}</p>
+                            <h3 className="text-xl font-black italic tracking-tighter uppercase">{formData.nftName || "NFT_IDENTITY"}</h3>
+                        </div>
+                    </div>
                 </motion.div>
 
-                {/* NFT Name */}
-                <motion.div variants={fieldVariants}>
-                    <TextInput
-                        label="NFT_NAME"
-                        name="nftName"
-                        value={formData.nftName}
-                        onChange={handleChange}
-                        placeholder="e.g., QUANTUM_REALM_KEY"
-                        errorMessage={errors.nftName}
-                    />
-                </motion.div>
+                {/* FORM FIELDS */}
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 gap-6">
+                        <TextInput
+                            label="METADATA_IMAGE_URL"
+                            name="imageUrl"
+                            placeholder="https://ipfs.io/ipfs/..."
+                            value={formData.imageUrl}
+                            onChange={handleChange}
+                            errorMessage={errors.imageUrl}
+                        />
 
-                {/* Description - Using TextInput but can be a custom TextArea if needed */}
-                <motion.div variants={fieldVariants}>
-                    <TextInput
-                        label="DESCRIPTION"
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        placeholder="Detailed description of the NFT"
-                        maxLength={250} // Example
-                        errorMessage={errors.description}
-                    />
-                </motion.div>
+                        <TextInput
+                            label="ASSET_NAME"
+                            name="nftName"
+                            placeholder="e.g. CYBER_PUNK_#001"
+                            value={formData.nftName}
+                            onChange={handleChange}
+                            errorMessage={errors.nftName}
+                        />
 
-                {/* Category Select */}
-                <motion.div variants={fieldVariants}>
-                    <SelectInput
-                        label="CATEGORY"
-                        name="category"
-                        options={NFT_CATEGORIES}
-                        value={formData.category}
-                        onChange={handleChange}
-                        errorMessage={errors.category}
-                    />
-                </motion.div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <NumberInput
+                                label="LISTING_PRICE (TON)"
+                                name="priceTon"
+                                value={formData.priceTon}
+                                onChange={handleChange}
+                                errorMessage={errors.priceTon}
+                            />
+                            <SelectInput
+                                label="CLASS"
+                                name="category"
+                                options={NFT_CATEGORIES}
+                                value={formData.category}
+                                onChange={handleChange}
+                            />
+                        </div>
 
-                {/* Price (TON) */}
-                <motion.div variants={fieldVariants}>
-                    <NumberInput
-                        label="PRICE (TON)"
-                        name="priceTon"
-                        value={formData.priceTon === 0 ? '' : formData.priceTon} // Show empty if 0 for better UX
-                        onChange={handleChange}
-                        step="0.1"
-                        min="0"
-                        placeholder="0.0 TON"
-                        errorMessage={errors.priceTon}
-                    />
-                </motion.div>
+                        <TextInput
+                            label="CONTRACT_ADDRESS"
+                            name="contractAddress"
+                            placeholder="EQB... (TON_SMART_CONTRACT)"
+                            value={formData.contractAddress}
+                            onChange={handleChange}
+                            errorMessage={errors.contractAddress}
+                        />
 
-                {/* Royalty Percentage */}
-                <motion.div variants={fieldVariants}>
-                    <NumberInput
-                        label="ROYALTY (%)"
-                        name="royalty"
-                        value={formData.royalty}
-                        onChange={handleChange}
-                        step="1"
-                        min="0"
-                        max="20"
-                        placeholder="5%"
-                        errorMessage={errors.royalty}
-                    />
-                </motion.div>
+                        <div className="bg-[#1a1a2e]/40 p-4 rounded-2xl border border-white/5 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
+                                    <Globe size={18} />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-bold">PUBLIC_VISIBILITY</p>
+                                    <p className="text-[9px] text-zinc-500">LIST ON MARKETPLACE IMMEDIATELY</p>
+                                </div>
+                            </div>
+                            <ToggleSwitch
+                                label="LISTED"
+                                name="isListed"
+                                checked={formData.isListed}
+                                onChange={(val) => setFormData(p => ({ ...p, isListed: val }))}
+                            />
+                        </div>
+                    </div>
 
-                {/* Mint Date */}
-                <motion.div variants={fieldVariants}>
-                    <TextInput
-                        label="MINT_DATE"
-                        name="mintDate"
-                        type="date"
-                        value={formData.mintDate}
-                        onChange={handleChange}
-                        errorMessage={errors.mintDate}
-                        max={getTodayDate()} // Cannot select future date
-                    />
-                </motion.div>
-
-                {/* Contract Address */}
-                <motion.div variants={fieldVariants}>
-                    <TextInput
-                        label="CONTRACT_ADDRESS"
-                        name="contractAddress"
-                        value={formData.contractAddress}
-                        onChange={handleChange}
-                        placeholder="0:a1b2c3d4e5f6..."
-                        errorMessage={errors.contractAddress}
-                    />
-                </motion.div>
-
-                {/* Is Listed Toggle */}
-                <motion.div variants={fieldVariants}>
-                    <ToggleSwitch
-                        label="LIST_NFT_IMMEDIATELY"
-                        name="isListed"
-                        checked={formData.isListed}
-                        onChange={(checked) => handleToggleChange('isListed', checked)}
-                    />
-                </motion.div>
-
-                {/* Submit Button */}
-                <motion.div variants={fieldVariants} className="pt-4">
                     <PrimaryButton
-                        label="DEPLOY_NFT_TO_NETWORK"
-                        icon={Upload}
+                        label={isLoading ? "EXECUTING_DEPLOYMENT..." : "CONFIRM_MINT_REQUEST"}
+                        icon={Zap}
                         type="submit"
                         isLoading={isLoading}
-                        disabled={isLoading}
                     />
-                </motion.div>
-            </motion.form>
+                </form>
+            </div>
         </div>
     );
 };
