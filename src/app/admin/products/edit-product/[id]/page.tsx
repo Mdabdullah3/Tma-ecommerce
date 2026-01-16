@@ -110,7 +110,7 @@ const EditProductForm: React.FC<EditProductFormProps> = () => {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-8 rounded-3xl overflow-hidden border border-white/10 bg-gradient-to-b from-zinc-900 to-black shadow-2xl"
+                    className="mb-8 rounded-3xl overflow-hidden border border-white/10 bg-linear-to-b from-zinc-900 to-black shadow-2xl"
                 >
                     <div className="aspect-square w-full relative bg-zinc-900 flex items-center justify-center">
                         {formData.image ? (
@@ -184,7 +184,7 @@ const EditProductForm: React.FC<EditProductFormProps> = () => {
                             icon={Undo2}
                             type="button"
                             onClick={() => window.history.back()}
-                            className="!bg-zinc-800"
+                            className="bg-zinc-800!"
                         />
                         <PrimaryButton
                             label="SAVE_CHANGES"

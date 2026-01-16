@@ -9,30 +9,25 @@ import {
 import Background from '@/components/Background';
 import PageHeader from '@/components/PageHeader';
 import StickyButton from '@/components/StickyButton';
+import { useCartStore } from '../store/useCartStore';
 
-const INITIAL_ITEMS = [
-    { id: 1, name: "ROSE_GENESIS", price: 2.40, cat: "ART_CORE", supply: "1/50", img: "https://nftmak.netlify.app/assets/img/others/top_collection01.jpg" },
-    { id: 2, name: "AMETHYST_V1", price: 1.15, cat: "NEO_WEAR", supply: "12/100", img: "https://nftmak.netlify.app/assets/img/others/top_collection02.jpg" },
-];
 
 const VALID_COUPONS: Record<string, number> = { "SOVEREIGN": 0.20, "GIFT50": 0.50 };
 
 export default function UnifiedVault() {
-    const [items, setItems] = useState(INITIAL_ITEMS);
+    const { cartItems, removeFromCart } = useCartStore();
     const [couponInput, setCouponInput] = useState("");
     const [discount, setDiscount] = useState(0);
     const [couponStatus, setCouponStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-    const subtotal = items.reduce((acc, item) => acc + item.price, 0);
+    const subtotal = cartItems.reduce((acc, item) => acc + item.priceTon, 0);
     const protocolFee = 0.05;
     const discountAmount = subtotal * discount;
     const total = subtotal + protocolFee - discountAmount;
 
 
 
-    const removeItem = (id: number) => {
-        setItems(items.filter(item => item.id !== id));
-    };
+
 
     const handleApplyCoupon = () => {
         const code = couponInput.toUpperCase().trim();
@@ -59,9 +54,9 @@ export default function UnifiedVault() {
                 {/* --- SECTION 1: INVENTORY CHAMBERS --- */}
                 <section className="space-y-3 mt-2">
                     <AnimatePresence mode='popLayout'>
-                        {items.length > 0 ? items.map((item) => (
+                        {cartItems.length > 0 ? cartItems.map((item) => (
                             <motion.div
-                                key={item.id}
+                                key={item._id}
                                 layout
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
@@ -69,22 +64,22 @@ export default function UnifiedVault() {
                                 className="relative group bg-[#050505]/40 rounded-[40px] p-4 flex items-center gap-5 border border-white/5 shadow-2xl"
                             >
                                 <div className="relative w-20 h-20 rounded-[24px] overflow-hidden border border-white/10 flex-shrink-0">
-                                    <img src={item.img} className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 transition-all duration-700" alt="T" />
+                                    <img src={item.image} className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 transition-all duration-700" alt="T" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-[7px] font-mono font-black text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded">ID_0{item.id}</span>
-                                        <span className="text-[7px] font-bold text-zinc-600 uppercase tracking-widest">{item.cat}</span>
+                                        <span className="text-[7px] font-mono font-black text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded">ID_0{item?.productId || '0g0'}</span>
+                                        <span className="text-[7px] font-bold text-zinc-600 uppercase tracking-widest">{item.category}</span>
                                     </div>
                                     <h3 className="text-sm font-black italic tracking-tighter text-white uppercase truncate">{item.name}</h3>
                                     <div className="flex items-baseline gap-1 mt-1">
-                                        <span className="text-xs font-black text-white">{item.price}</span>
+                                        <span className="text-xs font-black text-white">{item.priceTon}</span>
                                         <span className="text-[8px] font-bold text-amber-500">TON</span>
                                     </div>
                                 </div>
                                 <motion.button
                                     whileTap={{ scale: 0.8 }}
-                                    onClick={() => removeItem(item.id)}
+                                    onClick={() => removeFromCart(item._id)}
                                     className="w-11 h-11 rounded-2xl bg-rose-500/10 text-rose-500 border border-rose-500/20 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"
                                 >
                                     <Trash2 size={16} />
@@ -93,14 +88,14 @@ export default function UnifiedVault() {
                         )) : (
                             <div className="py-20 flex flex-col items-center gap-4 opacity-20 grayscale">
                                 <Hash size={48} strokeWidth={1} />
-                                <span className="text-[10px] font-black tracking-widest uppercase">Void_Manifest</span>
+                                <span className="text-[10px] font-black tracking-widest uppercase">NO_ITEMS</span>
                             </div>
                         )}
                     </AnimatePresence>
                 </section>
 
                 {/* --- SECTION 2: CONFIGURATION (COUPON) --- */}
-                {items.length > 0 && (
+                {cartItems?.length > 0 && (
                     <section className="space-y-4">
                         <div className="flex items-center gap-4 px-2">
                             <span className="text-[9px] font-black tracking-[0.4em] text-zinc-600 uppercase italic leading-none">Voucher</span>
@@ -131,7 +126,7 @@ export default function UnifiedVault() {
                 )}
 
                 {/* --- SECTION 3: FINANCIAL AUDIT --- */}
-                {items.length > 0 && (
+                {cartItems.length > 0 && (
                     <section className="space-y-2">
 
                         <div className="bg-[#050505]/60 rounded-[45px] p-8 border border-white/5 shadow-2xl space-y-6">
@@ -143,7 +138,7 @@ export default function UnifiedVault() {
                                 <div className="flex justify-between items-center text-zinc-500">
                                     <div className="flex items-center gap-2">
                                         <Cpu size={12} className="text-amber-500/50" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest italic">Protocol Fee</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest italic">Platform Fee</span>
                                     </div>
                                     <span className="text-sm font-black italic text-amber-500">+{protocolFee} TON</span>
                                 </div>
@@ -177,8 +172,8 @@ export default function UnifiedVault() {
             </main>
 
             {/* --- SECTION 4: THE EXECUTION HUB (STICKY) --- */}
-            {items.length > 0 && (
-                <StickyButton itemCount={items.length} onClick={handleCheckout} title="CHECKOUT" subtitle="PROCEED" />
+            {cartItems.length > 0 && (
+                <StickyButton itemCount={total || 0} onClick={handleCheckout} title="CHECKOUT" subtitle="PROCEED" />
             )}
         </div>
     );
