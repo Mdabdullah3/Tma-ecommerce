@@ -72,6 +72,7 @@ const SelectInput: React.FC<SelectInputProps> = ({ label, options, errorMessage,
                         {options.map(option => (
                             <motion.button
                                 key={option.value}
+                                type="button"
                                 whileTap={{ scale: 0.99, backgroundColor: 'rgba(255,255,255,0.05)' }} // Subtle tap effect
                                 onClick={() => {
                                     props.onChange && props.onChange({ target: { value: option.value, name: props.name } } as React.ChangeEvent<HTMLSelectElement>);

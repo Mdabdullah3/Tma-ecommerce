@@ -3,33 +3,33 @@ import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongodb";
 import Product from "@/models/Product";
 import { CORS_HEADERS } from "@/lib/cors";
-
+import mongoose from "mongoose";
 type Context = { params: Promise<{ id: string }> };
 
-/**
- * OPTIONS: Handle Preflight for PUT/DELETE
- */
-export async function OPTIONS() {
-  return new Response(null, { status: 204, headers: CORS_HEADERS });
-}
-
-/**
- * GET: Fetch a single product by its custom ID (e.g., nft001)
- */
 export async function GET(req: NextRequest, { params }: Context) {
   try {
     await dbConnect();
     const { id } = await params;
 
-    const product = await Product.findOne({ id: id }).lean();
+    // 1. Validate the ID format to prevent Mongoose casting errors
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, message: "INVALID_MONGODB_ID_FORMAT" },
+        { status: 400, headers: CORS_HEADERS }
+      );
+    }
 
+    // 2. Search using findById (which targets the _id field)
+    const product = await Product.findById(id).lean();
+    console.log(product, "product");
     if (!product) {
       return NextResponse.json(
-        { success: false, message: "Product not found" },
+        { success: false, message: "ASSET_NOT_FOUND_IN_DB" },
         { status: 404, headers: CORS_HEADERS }
       );
     }
 
+    // Return the product. Note: MongoDB returns '_id', not 'id'
     return NextResponse.json(
       { success: true, data: product },
       { headers: CORS_HEADERS }
@@ -43,64 +43,71 @@ export async function GET(req: NextRequest, { params }: Context) {
 }
 
 /**
- * PUT: Update product details
+ * PUT: Update product details by _id
  */
 export async function PUT(req: NextRequest, { params }: Context) {
   try {
     await dbConnect();
     const { id } = await params;
-    const updates = await req.json();
+    const body = await req.json();
 
-    const updatedProduct = await Product.findOneAndUpdate(
-      { id: id },
-      { $set: updates },
-      { new: true, runValidators: true }
-    ).lean();
-
-    if (!updatedProduct) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
-        { success: false, message: "Product not found" },
-        { status: 404, headers: CORS_HEADERS }
+        { success: false, message: "INVALID_ID" },
+        { status: 400 }
       );
     }
 
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      { $set: body },
+      { new: true, runValidators: true }
+    ).lean();
+
     return NextResponse.json(
-      { success: true, data: updatedProduct, message: "Product updated." },
+      { success: true, data: updatedProduct },
       { headers: CORS_HEADERS }
     );
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message },
-      { status: 400, headers: CORS_HEADERS }
+      { status: 400 }
     );
   }
 }
 
 /**
- * DELETE: Remove product from database
+ * DELETE: Remove product by _id
  */
 export async function DELETE(req: NextRequest, { params }: Context) {
   try {
     await dbConnect();
     const { id } = await params;
 
-    const deletedProduct = await Product.findOneAndDelete({ id: id });
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, message: "INVALID_ID" },
+        { status: 400 }
+      );
+    }
+
+    const deletedProduct = await Product.findByIdAndDelete(id);
 
     if (!deletedProduct) {
       return NextResponse.json(
-        { success: false, message: "Product not found" },
-        { status: 404, headers: CORS_HEADERS }
+        { success: false, message: "PRODUCT_NOT_FOUND" },
+        { status: 404 }
       );
     }
 
     return NextResponse.json(
-      { success: true, message: "Product deleted successfully." },
+      { success: true, message: "PRODUCT_DELETED" },
       { headers: CORS_HEADERS }
     );
   } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message },
-      { status: 500, headers: CORS_HEADERS }
+      { status: 500 }
     );
   }
 }

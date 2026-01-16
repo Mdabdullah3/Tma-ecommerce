@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, Edit, Trash2, List, Layers, Bitcoin, Sliders, Eye, CheckCircle, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Plus, Search, Edit, Trash2, Layers, Bitcoin, Sliders, Eye } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import Background from '@/components/Background';
 import Link from 'next/link';
@@ -90,7 +90,10 @@ const ProductManager: React.FC = () => {
                                 <div className="text-blue-400 font-black text-sm mt-1">{product.priceTon} TON</div>
                             </div>
                             <div className="flex flex-col gap-2">
-                                <button onClick={() => deleteProduct(product.productId)} className="p-2 bg-rose-900/20 text-rose-500 rounded-full hover:bg-rose-600 hover:text-white transition-all">
+                                <Link href={`/admin/products/edit-product/${product?._id}`} className="p-2 bg-gray-500/20 hover:bg-primary rounded-full hover:text-white transition-all">
+                                    <Edit size={14} />
+                                </Link>
+                                <button onClick={() => deleteProduct(product?._id)} className="p-2 bg-rose-900/20 text-rose-500 rounded-full hover:bg-rose-600 hover:text-white transition-all">
                                     <Trash2 size={14} />
                                 </button>
                             </div>

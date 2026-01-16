@@ -31,11 +31,9 @@ const ProductForm: React.FC = () => {
 
     const [formData, setFormData] = useState({
         nftName: '',
-        description: '',
         category: 'COLLECTIBLE',
         priceTon: 0,
         imageUrl: '',
-        contractAddress: '',
         isListed: true,
     });
 
@@ -53,9 +51,7 @@ const ProductForm: React.FC = () => {
         const newErrors: Record<string, string> = {};
         if (!formData.nftName) newErrors.nftName = "REQUIRED_FIELD";
         if (!formData.imageUrl.startsWith('http')) newErrors.imageUrl = "INVALID_URL_PROTOCOL";
-        if (!formData.contractAddress) newErrors.contractAddress = "ADDRESS_MISSING";
         if (formData.priceTon <= 0) newErrors.priceTon = "INVALID_PRICE";
-
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -145,6 +141,7 @@ const ProductForm: React.FC = () => {
                             errorMessage={errors.nftName}
                         />
 
+
                         <div className="grid grid-cols-2 gap-4">
                             <NumberInput
                                 label="LISTING_PRICE (TON)"
@@ -162,14 +159,7 @@ const ProductForm: React.FC = () => {
                             />
                         </div>
 
-                        <TextInput
-                            label="CONTRACT_ADDRESS"
-                            name="contractAddress"
-                            placeholder="EQB... (TON_SMART_CONTRACT)"
-                            value={formData.contractAddress}
-                            onChange={handleChange}
-                            errorMessage={errors.contractAddress}
-                        />
+                        
 
                         <div className="bg-[#1a1a2e]/40 p-4 rounded-2xl border border-white/5 flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -191,7 +181,7 @@ const ProductForm: React.FC = () => {
                     </div>
 
                     <PrimaryButton
-                        label={isLoading ? "EXECUTING_DEPLOYMENT..." : "CONFIRM_MINT_REQUEST"}
+                        label={"CONFIRM_MINT_REQUEST"}
                         icon={Zap}
                         type="submit"
                         isLoading={isLoading}
