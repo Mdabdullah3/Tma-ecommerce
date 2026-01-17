@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, Handbag } from 'lucide-react';
+import { Plus, Zap, Diamond, ShoppingBag } from 'lucide-react';
 import CategorySlider from '@/components/CategorySlider';
 import SovereignHeader from '@/components/Header';
 import FloatingCartButton from '@/components/FloatingCartButton';
@@ -12,102 +12,155 @@ import { useProductStore } from './store/useProductStore';
 import Loading from '@/components/Loading';
 import { useCartStore } from './store/useCartStore';
 
-const PRODUCTS = [
-  { id: 1, name: "ROSE_GENESIS", price: "2.40", cat: "ART", img: "https://nftmak.netlify.app/assets/img/others/top_collection01.jpg" },
-  { id: 2, name: "AMETHYST_V1", price: "1.15", cat: "WEAR", img: "https://nftmak.netlify.app/assets/img/others/top_collection02.jpg" },
-  { id: 3, name: "CHROME_CORE", price: "4.80", cat: "HARD", img: "https://shreethemes.in/superex/layouts/images/items/3.jpg" },
-  { id: 4, name: "NOIR_ELEMENT", price: "0.95", cat: "ACC", img: "https://shreethemes.in/superex/layouts/images/items/1.jpg" },
-];
-
 export default function MobileBoutique2026() {
-  const [cartCount, setCartCount] = useState(0);
-  const { products, fetchProducts, loading } = useProductStore()
+  const { products, fetchProducts, loading } = useProductStore();
   const { addToCart, cartItems } = useCartStore();
 
+  // --- FIX 1: PREVENT INFINITE LOOP ---
+  // We use an empty dependency array [] so this ONLY runs once when the app opens.
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts])
+  }, []);
+
+
 
   if (loading) {
-    return <Loading />
+    return <Loading />;
   }
 
-  return (
-    <div className="min-h-screen bg-[#020617] text-white selection:bg-primary pb-24 relative overflow-hidden">
-      <Background />
-      <SovereignHeader />
-      <main className="relative z-10 pt-24 px-4">
-        <CategorySlider />
-        {/* --- DYNAMIC PRODUCT GRID --- */}
-        <div className="grid grid-cols-2 gap-4 pt-4">
-          {products.map((item) => {
 
+  return (
+    <div className="min-h-screen text-white font-sans selection:bg-indigo-500/30 pb-32 relative overflow-hidden">
+
+      {/* Background with performance optimization */}
+      <Background />
+
+      <SovereignHeader />
+
+      <main className="relative z-10 pt-20 px-4">
+        <MarketTicker />
+        <CategorySlider />
+        <div className="grid grid-cols-2 gap-x-4 mt-4 gap-y-8">
+          {products.map((item, index) => {
             const isInCart = cartItems.some(cartItem => cartItem._id === item._id);
 
+            // Dynamic Rarity Colors (You can hook this to real data later)
+            const isLegendary = index % 3 === 0; // Fake logic for demo
+            const glowColor = isLegendary ? '#d946ef' : '#06b6d4'; // Fuchsia vs Cyan
+            const rarityText = isLegendary ? 'LEGENDARY_CLASS' : 'STANDARD_ISSUE';
+
             return (
-              <Link href={`/products/${item?._id}`} key={item?._id}>
+              <Link href={`/products/${item?._id}`} key={item?._id || index}>
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  whileTap={{ scale: 0.98 }}
-                  className="relative flex flex-col group"
+                  viewport={{ once: true, margin: "-10%" }}
+                  transition={{ delay: index * 0.08, duration: 0.6, ease: "backOut" }}
+                  className="group relative flex flex-col h-full"
                 >
-                  {/* --- CARD ARCHITECTURE --- */}
-                  <div className="relative aspect-4/5 rounded-[40px] overflow-hidden border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-primary/30 bg-[#0a0a0a]/40 backdrop-blur-sm">
 
-                    {/* Product Asset (Image) */}
-                    <motion.img
-                      src={item?.image}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-all duration-1000"
-                      alt={item.name}
-                    />
+                  {/* --- 0. AMBIENT GLOW BEHIND CARD (The Aura) --- */}
+                  <div
+                    className="absolute -inset-0.5 rounded-[34px] blur-xl opacity-0 group-hover:opacity-40 transition-opacity duration-700"
+                    style={{ backgroundColor: glowColor }}
+                  />
 
-                    {/* --- THE PRICE MONOLITH (MATCHED COLORS) --- */}
-                    <div className="absolute bottom-0 inset-x-0 p-2">
-                      <div className="bg-black/60 backdrop-blur-3xl border border-white/5 rounded-[28px] p-1.5 flex items-center justify-between">
+                  {/* --- 1. THE MAIN FRAME (Glass & Metal) --- */}
+                  <div className="relative w-full aspect-[3/4.2] rounded-[32px] overflow-hidden bg-[#050505] p-[1px] transition-transform duration-500 group-hover:-translate-y-2 group-hover:shadow-2xl">
 
-                        {/* Price Section */}
-                        <div className="pl-3 flex flex-col">
-                          <span className="text-[6px] font-black text-zinc-500 tracking-widest uppercase mb-0.5 italic">PRICE</span>
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-sm font-black text-white italic tracking-tighter">{item.priceTon}</span>
-                            <span className="text-[8px] font-bold text-primary">TON</span>
+                    {/* Animated Border Gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/5 opacity-50" />
+
+                    {/* INNER CONTENT CONTAINER */}
+                    <div className="relative w-full h-full rounded-[31px] overflow-hidden bg-zinc-900">
+
+                      {/* --- 2. HEADER HUD --- */}
+                      <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-black/80 to-transparent z-20 p-3 flex justify-between items-start">
+
+                        {/* Rarity Tag */}
+                        <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-lg px-2 py-1 flex flex-col items-start gap-0.5">
+                          <span className="text-[6px] font-mono text-zinc-400 uppercase tracking-widest">TIER_{index + 1}</span>
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_8px_currentColor]" style={{ color: glowColor, backgroundColor: glowColor }} />
+                            <span className="text-[8px] font-bold text-white tracking-widest">{rarityText}</span>
                           </div>
                         </div>
-                        <motion.button
-                          whileTap={{ scale: 0.9 }}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (!isInCart) {
-                              addToCart(item);
-                            }
-                          }}
-                          className={`relative w-11 h-11 rounded-[20px] flex items-center justify-center overflow-hidden transition-all duration-500 shadow-lg
-        ${isInCart ? 'bg-green-500 text-white' : 'bg-white text-black'}`}
-                        >
-                          {isInCart ? (
-                            <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }}>✓</motion.span>
-                          ) : (
-                            <Handbag size={20} />
-                          )}
-                        </motion.button>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* --- TYPOGRAPHY FOOTER --- */}
-                  <div className="mt-4 px-3 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-xs font-black italic tracking-tighter text-white uppercase group-hover:text-primary transition-colors">
-                        {item.name}
-                      </h3>
-                      <div className="h-px flex-1 bg-white/5" />
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-[8px] font-bold text-zinc-600 tracking-widest uppercase">Verified_Artifact</span>
-                      <ArrowUpRight size={10} className="text-zinc-700 group-hover:text-white transition-colors" />
+                        {/* Like Icon */}
+                        <div className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/50 group-hover:text-white group-hover:bg-white/20 transition-all">
+                          <Diamond size={12} />
+                        </div>
+                      </div>
+
+                      {/* --- 3. THE IMAGE & EFFECTS --- */}
+                      <div className="relative w-full h-full">
+                        <img
+                          src={item?.image}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110"
+                          alt={item.name}
+                        />
+                        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_50%,rgba(0,0,0,0.3)_50%)] bg-[size:100%_4px] opacity-20 pointer-events-none" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-90" />
+                      </div>
+
+                      {/* --- 4. THE DATA TERMINAL (Bottom Info) --- */}
+                      <div className="absolute bottom-0 inset-x-0 p-3 z-30">
+
+                        {/* Glass Panel */}
+                        <div className="relative bg-white/5 backdrop-blur-2xl border-t border-white/10 rounded-[24px] p-3 overflow-hidden group-hover:bg-white/10 transition-colors duration-500">
+
+                          {/* Decorative Top Line */}
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-[2px]" style={{ backgroundColor: glowColor }} />
+
+                          <div className="flex justify-between items-end gap-2">
+
+                            {/* Left: Info */}
+                            <div className="flex flex-col gap-1 flex-1 min-w-0">
+                              <h3 className="text-[10px] font-mono text-zinc-400 truncate uppercase tracking-wider">
+                                {item.name}
+                              </h3>
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-2xl font-black text-white tracking-tighter shadow-black drop-shadow-lg leading-none">
+                                  {item.priceTon}
+                                </span>
+                                <span className="text-[9px] font-bold uppercase tracking-wide opacity-80" style={{ color: glowColor }}>
+                                  TON
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Right: The TRIGGER Button */}
+                            <motion.button
+                              whileTap={{ scale: 0.9 }}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                if (!isInCart) addToCart(item);
+                              }}
+                              className={`
+                                relative w-12 h-12 rounded-[16px] flex items-center justify-center overflow-hidden transition-all duration-300
+                                ${isInCart ? ' bg-[#06daff]' : 'bg-white group-hover:scale-105'}
+                            `}
+                            >
+                              {/* Inner Gradient for "Metallic" look */}
+                              {!isInCart && <div className="absolute inset-0 bg-gradient-to-br from-white via-zinc-100 to-zinc-400 opacity-50" />}
+
+                              {isInCart ? (
+                                <ShoppingBag
+                                  size={22}
+                                  strokeWidth={2.5}
+                                  className="text-white fill-white/30"
+                                />
+                              ) : (
+                                <Plus size={24} className="text-black relative z-10" strokeWidth={2.5} />
+                              )}
+                            </motion.button>
+                          </div>
+                        </div>
+                      </div>
+
                     </div>
                   </div>
                 </motion.div>
@@ -117,18 +170,39 @@ export default function MobileBoutique2026() {
         </div>
       </main>
 
-      <FloatingCartButton itemCount={cartItems.length || 0}  />
-
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Satoshi:wght@700;900&display=swap');
-        body { 
-          background-color: #020617; 
-          font-family: 'Satoshi', sans-serif;
-          overscroll-behavior-y: none;
-          -webkit-font-smoothing: antialiased;
-        }
-        ::-webkit-scrollbar { display: none; }
-      `}</style>
+      <FloatingCartButton itemCount={cartItems.length || 0} />
     </div>
   );
 }
+
+const MarketTicker = () => {
+  return (
+    <div className="relative z-20 px-2 w-full overflow-hidden pt-2 backdrop-blur-md ">
+      <motion.div
+        className="flex items-center gap-x-8 whitespace-nowrap py-2"
+        animate={{ x: ["0%", "-50%"] }}
+        transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+      >
+        {[...Array(2)].map((_, i) => (
+          <React.Fragment key={i}>
+            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+              MARKET_STATUS: <span className="text-emerald-400">ONLINE</span>
+            </span>
+            <span className="text-[10px] font-mono text-zinc-500 uppercase">
+              TON: <span className="text-white font-bold">$5.24</span> <span className="text-emerald-500">(+2.4%)</span>
+            </span>
+            <span className="text-[10px] font-mono text-zinc-500 uppercase">
+              VOL: <span className="text-white font-bold">24.5M</span>
+            </span>
+            <span className="text-[10px] font-mono text-zinc-500 uppercase">
+              LATEST_MINT: <span className="text-fuchsia-400">CYBER_APE #4902</span>
+            </span>
+            <span className="text-[10px] font-mono text-zinc-500 uppercase">
+              GAS: <span className="text-yellow-400">LOW</span>
+            </span>
+          </React.Fragment>
+        ))}
+      </motion.div>
+    </div>
+  );
+};

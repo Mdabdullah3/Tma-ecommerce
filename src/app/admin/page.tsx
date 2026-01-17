@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
     Activity, Users, ShoppingBag, PieChart, Database, Settings, BarChart, HardDrive, ShieldCheck, LogOut,
@@ -9,15 +9,43 @@ import MenuButton from '@/components/MenuButton';
 import Background from '@/components/Background';
 import Link from 'next/link';
 
-interface AdminDashboardProps {
-    onTerminateAccess: () => void;
-}
+const AdminDashboard = () => {
+    const [stats, setStats] = useState({ revenue: "0", users: "0", loading: true });
 
-const AdminDashboard: React.FC<AdminDashboardProps> = () => {
+    useEffect(() => {
+        const fetchMetrics = async () => {
+            try {
+                const res = await fetch('/api/admin/metrics');
+                const result = await res.json();
+                if (result.success) {
+                    setStats({
+                        revenue: result.data.totalRevenue,
+                        users: result.data.totalUsers.toString(),
+                        loading: false
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to fetch metrics", err);
+            }
+        };
+        fetchMetrics();
+    }, []);
 
     const metrics = [
-        { id: 'totalSales', name: 'TOTAL REVENUE', value: '$1.78M', icon: TrendingUp, color: 'linear-gradient(45deg, #f59e0b, #eab308)' },
-        { id: 'totalUsers', name: 'ACTIVE USERS', value: '12,045', icon: Users, color: 'linear-gradient(45deg, #3b82f6, #2563eb)' },
+        {
+            id: 'totalSales',
+            name: 'TOTAL REVENUE',
+            value: stats.loading ? '...' : `${stats.revenue} TON`,
+            icon: TrendingUp,
+            color: 'linear-gradient(45deg, #f59e0b, #eab308)'
+        },
+        {
+            id: 'totalUsers',
+            name: 'ACTIVE USERS',
+            value: stats.loading ? '...' : stats.users,
+            icon: Users,
+            color: 'linear-gradient(45deg, #3b82f6, #2563eb)'
+        },
         { id: 'cpuLoad', name: 'CPU LOAD', value: '38%', icon: Cpu, color: 'linear-gradient(45deg, #a855f7, #9333ea)' },
         { id: 'serverUptime', name: 'SERVER UPTIME', value: '99.98%', icon: Server, color: 'linear-gradient(45deg, #22c55e, #16a34a)' },
     ];
@@ -132,10 +160,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
                 </motion.section>
 
                 {/* Terminate Access Button - More dramatic */}
-                <motion.div variants={itemVariants} className="w-full">
+                <Link href={`/profile`} className="w-full">
                     <motion.button
                         whileTap={{ scale: 0.94 }}
-                        // onClick={onTerminateAccess}
                         className="w-full h-14 rounded-[35px] bg-gradient-to-br from-rose-950/40 to-rose-900/60 border border-rose-800/50 text-rose-400 font-extrabold tracking-widest uppercase text-sm flex items-center justify-center gap-3
                                    shadow-2xl shadow-rose-900/30 hover:from-rose-800/50 hover:to-rose-900/70 active:shadow-inner active:shadow-rose-900/50 transition-all duration-300 relative overflow-hidden"
                     >
@@ -143,7 +170,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = () => {
                         <span className="relative z-10">DISCONNECT</span>
                         <span className="absolute inset-0 rounded-[35px] ring-2 ring-rose-600 opacity-0 group-hover:animate-pulse-light pointer-events-none" />
                     </motion.button>
-                </motion.div>
+                </Link>
             </motion.div>
         </div>
     );

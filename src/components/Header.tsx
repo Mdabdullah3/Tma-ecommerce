@@ -4,7 +4,7 @@
 import { useEffect, useState, useRef } from 'react';
 import WebApp from '@twa-dev/sdk';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Shield, Wallet } from 'lucide-react';
+import { User, Shield, Wallet, ScanFace } from 'lucide-react';
 import Link from 'next/link';
 import { useUserStore } from '@/app/store/userStore';
 import { useTonConnectUI, useTonWallet, useTonAddress } from "@tonconnect/ui-react";
@@ -15,12 +15,10 @@ export default function SovereignHeader() {
     const registerUser = useUserStore((state) => state.registerUser);
     const hasRegistered = useRef(false);
 
-    // TON Real-time Hooks
     const wallet = useTonWallet();
     const address = useTonAddress();
     const [tonConnectUI] = useTonConnectUI();
 
-    // 1. Fetch Balance Logic
     useEffect(() => {
         const fetchBalance = async () => {
             if (!address) {
@@ -41,7 +39,6 @@ export default function SovereignHeader() {
         };
 
         fetchBalance();
-        // Refresh balance every 30 seconds
         const interval = setInterval(fetchBalance, 30000);
         return () => clearInterval(interval);
     }, [address]);
@@ -68,82 +65,79 @@ export default function SovereignHeader() {
         if (!wallet) {
             tonConnectUI.openModal();
         } else {
-            window.location.href = "/wallet";
+            // Ideally navigate to a wallet details page or disconnect
+            tonConnectUI.disconnect();
         }
     };
 
     return (
         <motion.header
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed top-0 inset-x-0 z-[100] px-6 pt-6 pb-2"
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="fixed top-0 inset-x-0 z-50 pt-4 px-4"
         >
-            <div className="absolute inset-x-4 top-4 bottom-0 bg-white/5 backdrop-blur-2xl rounded-[32px] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]" />
+            {/* Glass Container */}
+            <div className="relative bg-[#0a0a0a]/60 backdrop-blur-xl border border-white/10 rounded-full px-1.5 py-1.5 shadow-2xl flex items-center justify-between">
 
-            <div className="relative z-10 flex items-center justify-between px-2">
-                {/* --- LEFT: IDENTITY --- */}
-                <div className="flex items-center gap-3">
-                    <div className="relative group">
-                        <motion.div
-                            animate={{ opacity: [0.2, 0.4, 0.2] }}
-                            transition={{ duration: 3, repeat: Infinity }}
-                            className="absolute -inset-2 bg-blue-500/20 blur-xl rounded-full"
-                        />
-                        <div className="relative w-11 h-11 rounded-full overflow-hidden border border-white/20 p-[1px] bg-zinc-900">
-                            <Link href="/profile" className="w-full h-full rounded-full overflow-hidden block">
-                                {user.photo ? (
-                                    <img src={user.photo} className="w-full h-full object-cover" alt="Profile" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-zinc-800 text-white">
-                                        <User size={18} />
-                                    </div>
-                                )}
-                            </Link>
+                {/* --- IDENTITY SECTION --- */}
+                <Link href="/profile" className="flex items-center gap-3 pl-1 pr-4 py-1 rounded-full hover:bg-white/5 transition-colors">
+                    <div className="relative">
+                        {/* Avatar Ring */}
+                        <div className="absolute -inset-1 rounded-full border border-dashed border-zinc-600 animate-[spin_10s_linear_infinite]" />
+                        <div className="w-9 h-9 rounded-full overflow-hidden bg-zinc-800 border border-zinc-700 relative z-10">
+                            {user.photo ? (
+                                <img src={user.photo} className="w-full h-full object-cover" alt="User" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-zinc-400">
+                                    <User size={14} />
+                                </div>
+                            )}
                         </div>
                     </div>
-
                     <div className="flex flex-col">
-                        <span className="text-[10px] font-medium tracking-tight text-zinc-400 mb-0.5 uppercase italic">Welcome</span>
-                        <h2 className="text-xs font-black tracking-widest text-white truncate max-w-[120px]">
+                        <span className="text-[9px] font-mono text-zinc-500 uppercase leading-none mb-0.5">Operative</span>
+                        <span className="text-[11px] font-bold text-white tracking-wide uppercase truncate max-w-[100px]">
                             {user.name}
-                        </h2>
+                        </span>
                     </div>
-                </div>
+                </Link>
 
-                {/* --- RIGHT: SMART VAULT PILL (SHOWS BALANCE) --- */}
+                {/* --- WALLET / ACTION SECTION --- */}
                 <motion.button
-                    whileTap={{ scale: 0.96 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={handleWalletClick}
-                    className={`group relative flex items-center gap-3 pl-4 pr-5 py-2.5 rounded-full border transition-all duration-500 
+                    className={`
+                        relative overflow-hidden rounded-full py-2 px-4 flex items-center gap-2 border transition-all duration-300
                         ${wallet
-                            ? 'bg-white text-black border-white shadow-[0_10px_30px_rgba(255,255,255,0.1)]'
-                            : 'bg-transparent text-white border-white/20 hover:border-white/40'}`}
+                            ? 'bg-zinc-900 border-zinc-700 text-white'
+                            : 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.3)]'}
+                    `}
                 >
                     <AnimatePresence mode="wait">
                         {wallet ? (
                             <motion.div
-                                key="active"
-                                initial={{ y: 10, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                exit={{ y: -10, opacity: 0 }}
+                                key="connected"
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
                                 className="flex items-center gap-2"
                             >
-                                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                <span className="text-[11px] font-black italic tracking-tighter">
-                                    {balance ?? "..."} <span className="text-[8px] opacity-60">TON</span>
-                                </span>
-                                <Shield size={10} strokeWidth={3} className="ml-1 opacity-40" />
+                                <div className="flex flex-col items-end leading-none">
+                                    <span className="text-[10px] font-mono text-zinc-400">BALANCE</span>
+                                    <span className="text-xs font-black tracking-tight">{balance ?? "0.00"} TON</span>
+                                </div>
+                                <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center border border-zinc-700">
+                                    <Shield size={10} className="text-emerald-400" />
+                                </div>
                             </motion.div>
                         ) : (
                             <motion.div
-                                key="idle"
-                                initial={{ y: 10, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                exit={{ y: -10, opacity: 0 }}
+                                key="connect"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
                                 className="flex items-center gap-2"
                             >
-                                <Wallet size={12} className="opacity-60" />
-                                <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Connect</span>
+                                <span className="text-[10px] font-black tracking-widest uppercase">Connect</span>
+                                <Wallet size={12} strokeWidth={3} />
                             </motion.div>
                         )}
                     </AnimatePresence>

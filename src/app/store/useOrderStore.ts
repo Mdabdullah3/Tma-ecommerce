@@ -11,7 +11,7 @@ interface Order {
   createdAt?: string;
 }
 
-interface OrderState {
+export interface OrderState {
   orders: Order[];
   userOrders: Order[];
   loading: boolean;
@@ -36,6 +36,7 @@ export const useOrderStore = create<OrderState>((set) => ({
     try {
       const res = await fetch("/api/orders");
       const data = await res.json();
+      console.log(data);
       if (data.success) set({ orders: data.data, error: null });
     } catch (err: any) {
       set({ error: err.message });
