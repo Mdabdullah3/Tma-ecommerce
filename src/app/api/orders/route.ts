@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     const newOrder = await Order.create(body);
+    console.log("order", newOrder);
 
     return NextResponse.json(
       { success: true, data: newOrder },

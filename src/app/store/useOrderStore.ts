@@ -6,7 +6,7 @@ interface Order {
   user: string;
   products: any[];
   totalAmount: number;
-  status: "PENDING" | "COMPLETED" | "CANCELLED" | string;
+  status: "PENDING" | "COMPLETED" | "CANCELLED" | "DEMO_COMPLETED" | string;
   transactionHash?: string;
   createdAt?: string;
 }

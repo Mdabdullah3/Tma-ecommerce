@@ -59,6 +59,7 @@ export default function UnifiedVault() {
 
     // --- ENHANCED CHECKOUT LOGIC ---
     const handleCheckout = async () => {
+        console.log("button wokrs ");
         // 1. Connection Guard (Bypassed in Demo Mode)
         if (!userWalletAddress && !isDemoMode) {
             window.Telegram?.WebApp?.showConfirm("Wallet not detected. Connect now?", (confirmed) => {
@@ -88,15 +89,22 @@ export default function UnifiedVault() {
 
             // 3. Execution (Same for both, but walletAddress is mocked in Demo)
             const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+            // UnifiedVault.tsx inside handleCheckout
             const orderData = {
                 user: telegramUser?.id?.toString() || "PORTFOLIO_REVIEWER",
                 walletAddress: isDemoMode ? "DEMO_MODE_ACTIVE_00X1" : userWalletAddress,
-                products: cartItems,
+                products: cartItems.map(item => ({
+                    productId: item._id,
+                    name: item.name,
+                    priceTon: item.priceTon,
+                    image: item.image
+                })),
                 totalAmount: Number(total.toFixed(2)),
-                status: isDemoMode ? "DEMO_COMPLETED" : "PENDING" as any
+                status: isDemoMode ? "DEMO_COMPLETED" : "PENDING"
             };
 
             const success = await placeOrder(orderData);
+            console.log(success, "orders data");
 
             if (success) {
                 window.Telegram?.WebApp?.HapticFeedback.notificationOccurred('success');
