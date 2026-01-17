@@ -10,40 +10,105 @@ import Background from '@/components/Background';
 import PageHeader from '@/components/PageHeader';
 import StickyButton from '@/components/StickyButton';
 import { useCartStore } from '../store/useCartStore';
+import { useOrderStore } from '../store/useOrderStore';
+import { useRouter } from 'next/navigation';
+import { useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
 
-
-const VALID_COUPONS: Record<string, number> = { "SOVEREIGN": 0.20, "GIFT50": 0.50 };
+// Production Tip: Move this to an API or a config file later
+const VALID_COUPONS: Record<string, number> = {
+    "SOVEREIGN": 0.20,
+    "GIFT50": 0.50
+};
 
 export default function UnifiedVault() {
-    const { cartItems, removeFromCart } = useCartStore();
+    const { cartItems, clearCart, removeFromCart } = useCartStore();
+    const { placeOrder, loading: isOrdering } = useOrderStore();
+    const router = useRouter();
+
+    // TON Connect Hooks
+    const [tonConnectUI] = useTonConnectUI();
+    const userWalletAddress = useTonAddress();
+
+    // Coupon State
     const [couponInput, setCouponInput] = useState("");
     const [discount, setDiscount] = useState(0);
     const [couponStatus, setCouponStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
+    // Financial Logic
     const subtotal = cartItems.reduce((acc, item) => acc + item.priceTon, 0);
     const protocolFee = 0.05;
     const discountAmount = subtotal * discount;
-    const total = subtotal + protocolFee - discountAmount;
+    const total = Math.max(0, subtotal + protocolFee - discountAmount);
 
-
-
-
-
+    // --- COUPON HANDLER ---
     const handleApplyCoupon = () => {
         const code = couponInput.toUpperCase().trim();
+
         if (VALID_COUPONS[code]) {
             setDiscount(VALID_COUPONS[code]);
             setCouponStatus('success');
+            // Optional: Telegram haptic feedback
+            window.Telegram?.WebApp?.HapticFeedback.notificationOccurred('success');
         } else {
             setDiscount(0);
             setCouponStatus('error');
+            window.Telegram?.WebApp?.HapticFeedback.notificationOccurred('error');
+            // Reset status after 2 seconds to allow retry
             setTimeout(() => setCouponStatus('idle'), 2000);
         }
     };
 
-    const handleCheckout = () => {
-        // Checkout logic to be implemented
-    }
+    // --- CHECKOUT LOGIC ---
+    const handleCheckout = async () => {
+        // 1. Connection Guard
+        if (!userWalletAddress) {
+            window.Telegram?.WebApp?.showConfirm("Wallet not detected. Connect now?", (confirmed) => {
+                if (confirmed) tonConnectUI.openModal();
+            });
+            return;
+        }
+
+        try {
+            // 2. Blockchain Balance Check
+            const response = await fetch(`https://toncenter.com/api/v2/getAddressInformation?address=${userWalletAddress}`);
+            const data = await response.json();
+
+            if (!data.ok) throw new Error("Chain sync error");
+
+            const balanceTon = parseInt(data.result.balance) / 1000000000;
+
+            // 3. Insufficient Funds Guard
+            if (balanceTon < total) {
+                window.Telegram?.WebApp?.HapticFeedback.notificationOccurred('error');
+                window.Telegram?.WebApp?.showAlert(
+                    `INSUFFICIENT_FUNDS\nRequired: ${total.toFixed(2)} TON\nAvailable: ${balanceTon.toFixed(2)} TON`
+                );
+                return;
+            }
+
+            // 4. Order Execution
+            const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+            const orderData = {
+                user: telegramUser?.id?.toString() || "GUEST",
+                walletAddress: userWalletAddress,
+                products: cartItems,
+                totalAmount: Number(total.toFixed(2)),
+                status: "PENDING" as const
+            };
+
+            const success = await placeOrder(orderData);
+
+            if (success) {
+                window.Telegram?.WebApp?.HapticFeedback.notificationOccurred('success');
+                clearCart();
+                router.push('/profile');
+            }
+
+        } catch (error) {
+            console.error(error);
+            window.Telegram?.WebApp?.showAlert("Network error. Please check your connection.");
+        }
+    };
 
     return (
         <div className="min-h-screen bg-[#020617] text-white selection:bg-amber-500 overflow-x-hidden relative">
@@ -51,7 +116,7 @@ export default function UnifiedVault() {
             <PageHeader title="CHECKOUT_CART" />
 
             <main className="relative z-10 pt-20 pb-28 px-6 space-y-4">
-                {/* --- SECTION 1: INVENTORY CHAMBERS --- */}
+                {/* --- SECTION 1: INVENTORY --- */}
                 <section className="space-y-3 mt-2">
                     <AnimatePresence mode='popLayout'>
                         {cartItems.length > 0 ? cartItems.map((item) => (
@@ -64,11 +129,11 @@ export default function UnifiedVault() {
                                 className="relative group bg-[#050505]/40 rounded-[40px] p-4 flex items-center gap-5 border border-white/5 shadow-2xl"
                             >
                                 <div className="relative w-20 h-20 rounded-[24px] overflow-hidden border border-white/10 flex-shrink-0">
-                                    <img src={item.image} className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 transition-all duration-700" alt="T" />
+                                    <img src={item.image} className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 transition-all duration-700" alt={item.name} />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-[7px] font-mono font-black text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded">ID_0{item?.productId || '0g0'}</span>
+                                        <span className="text-[7px] font-mono font-black text-amber-500 bg-amber-500/10 px-1.5 py-0.5 rounded uppercase">Verified_Asset</span>
                                         <span className="text-[7px] font-bold text-zinc-600 uppercase tracking-widest">{item.category}</span>
                                     </div>
                                     <h3 className="text-sm font-black italic tracking-tighter text-white uppercase truncate">{item.name}</h3>
@@ -88,14 +153,14 @@ export default function UnifiedVault() {
                         )) : (
                             <div className="py-20 flex flex-col items-center gap-4 opacity-20 grayscale">
                                 <Hash size={48} strokeWidth={1} />
-                                <span className="text-[10px] font-black tracking-widest uppercase">NO_ITEMS</span>
+                                <span className="text-[10px] font-black tracking-widest uppercase">VAULT_EMPTY</span>
                             </div>
                         )}
                     </AnimatePresence>
                 </section>
 
-                {/* --- SECTION 2: CONFIGURATION (COUPON) --- */}
-                {cartItems?.length > 0 && (
+                {/* --- SECTION 2: COUPON --- */}
+                {cartItems.length > 0 && (
                     <section className="space-y-4">
                         <div className="flex items-center gap-4 px-2">
                             <span className="text-[9px] font-black tracking-[0.4em] text-zinc-600 uppercase italic leading-none">Voucher</span>
@@ -128,7 +193,6 @@ export default function UnifiedVault() {
                 {/* --- SECTION 3: FINANCIAL AUDIT --- */}
                 {cartItems.length > 0 && (
                     <section className="space-y-2">
-
                         <div className="bg-[#050505]/60 rounded-[45px] p-8 border border-white/5 shadow-2xl space-y-6">
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center text-zinc-500">
@@ -138,14 +202,14 @@ export default function UnifiedVault() {
                                 <div className="flex justify-between items-center text-zinc-500">
                                     <div className="flex items-center gap-2">
                                         <Cpu size={12} className="text-amber-500/50" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest italic">Platform Fee</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest italic">Protocol Fee</span>
                                     </div>
                                     <span className="text-sm font-black italic text-amber-500">+{protocolFee} TON</span>
                                 </div>
                                 <AnimatePresence>
                                     {discount > 0 && (
                                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="flex justify-between items-center text-green-500 border-t border-white/5 pt-4">
-                                            <span className="text-[10px] font-black uppercase tracking-widest italic leading-none">Privé_Discount</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest italic leading-none">Voucher_Applied</span>
                                             <span className="text-sm font-black italic">-{discountAmount.toFixed(2)} TON</span>
                                         </motion.div>
                                     )}
@@ -171,9 +235,14 @@ export default function UnifiedVault() {
                 )}
             </main>
 
-            {/* --- SECTION 4: THE EXECUTION HUB (STICKY) --- */}
+            {/* --- SECTION 4: THE EXECUTION HUB --- */}
             {cartItems.length > 0 && (
-                <StickyButton itemCount={total || 0} onClick={handleCheckout} title="CHECKOUT" subtitle="PROCEED" />
+                <StickyButton
+                    itemCount={isOrdering ? 0 : total.toFixed(2)}
+                    onClick={handleCheckout}
+                    title={!userWalletAddress ? "CONNECT_WALLET" : (isOrdering ? "PROCESSING" : "CHECKOUT")}
+                    subtitle={!userWalletAddress ? "REQUIRED_FOR_PURCHASE" : "SECURE_TRANSACTION"}
+                />
             )}
         </div>
     );

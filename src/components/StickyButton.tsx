@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 
-const StickyButton = ({ itemCount, onClick, title, subtitle }: { itemCount: number, onClick: () => void, title: string, subtitle: string }) => {
+const StickyButton = ({ itemCount, onClick, title, subtitle }: { itemCount: number | string, onClick: () => void, title: string, subtitle: string }) => {
     return (
         <div className="fixed bottom-0 inset-x-0 z-110 px-6 pb-4 pt-6 bg-linear-to-t from-black via-black/90 to-transparent">
             <div className="bg-primary text-white rounded-[40px] p-2 flex items-center justify-between shadow-[0_20px_50px_rgba(255,255,255,0.15)]">
