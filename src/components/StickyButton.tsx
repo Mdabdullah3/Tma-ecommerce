@@ -17,7 +17,7 @@ const StickyButton = ({ itemCount, onClick, title, subtitle }: { itemCount: numb
                 <motion.button
                     onClick={onClick}
                     whileTap={{ scale: 0.95 }}
-                    className={`px-8 h-12 rounded-full font-black text-xs tracking-widest uppercase italic cursor-pointer flex items-center gap-3 transition-all duration-700 
+                    className={`px-5 h-12 rounded-full font-black text-xs tracking-widest uppercase italic cursor-pointer flex items-center gap-3 transition-all duration-700 
                      bg-black text-white`}
                 >
                     {subtitle}

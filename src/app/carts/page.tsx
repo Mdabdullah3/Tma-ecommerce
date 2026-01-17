@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Trash2, Ticket,
-    Hash, Cpu
+    Hash, Cpu, FlaskConical, ShieldCheck
 } from 'lucide-react';
 import Background from '@/components/Background';
 import PageHeader from '@/components/PageHeader';
@@ -14,7 +15,6 @@ import { useOrderStore } from '../store/useOrderStore';
 import { useRouter } from 'next/navigation';
 import { useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
 
-// Production Tip: Move this to an API or a config file later
 const VALID_COUPONS: Record<string, number> = {
     "SOVEREIGN": 0.20,
     "GIFT50": 0.50
@@ -29,6 +29,9 @@ export default function UnifiedVault() {
     const [tonConnectUI] = useTonConnectUI();
     const userWalletAddress = useTonAddress();
 
+    // Demo Mode State (For Portfolio Testing)
+    const [isDemoMode, setIsDemoMode] = useState(false);
+
     // Coupon State
     const [couponInput, setCouponInput] = useState("");
     const [discount, setDiscount] = useState(0);
@@ -40,28 +43,24 @@ export default function UnifiedVault() {
     const discountAmount = subtotal * discount;
     const total = Math.max(0, subtotal + protocolFee - discountAmount);
 
-    // --- COUPON HANDLER ---
     const handleApplyCoupon = () => {
         const code = couponInput.toUpperCase().trim();
-
         if (VALID_COUPONS[code]) {
             setDiscount(VALID_COUPONS[code]);
             setCouponStatus('success');
-            // Optional: Telegram haptic feedback
             window.Telegram?.WebApp?.HapticFeedback.notificationOccurred('success');
         } else {
             setDiscount(0);
             setCouponStatus('error');
             window.Telegram?.WebApp?.HapticFeedback.notificationOccurred('error');
-            // Reset status after 2 seconds to allow retry
             setTimeout(() => setCouponStatus('idle'), 2000);
         }
     };
 
-    // --- CHECKOUT LOGIC ---
+    // --- ENHANCED CHECKOUT LOGIC ---
     const handleCheckout = async () => {
-        // 1. Connection Guard
-        if (!userWalletAddress) {
+        // 1. Connection Guard (Bypassed in Demo Mode)
+        if (!userWalletAddress && !isDemoMode) {
             window.Telegram?.WebApp?.showConfirm("Wallet not detected. Connect now?", (confirmed) => {
                 if (confirmed) tonConnectUI.openModal();
             });
@@ -69,44 +68,48 @@ export default function UnifiedVault() {
         }
 
         try {
-            // 2. Blockchain Balance Check
-            const response = await fetch(`https://toncenter.com/api/v2/getAddressInformation?address=${userWalletAddress}`);
-            const data = await response.json();
+            // 2. Conditional Logic: Real vs Demo
+            if (!isDemoMode) {
+                // REAL BLOCKCHAIN CHECK
+                const response = await fetch(`https://toncenter.com/api/v2/getAddressInformation?address=${userWalletAddress}`);
+                const data = await response.json();
+                if (!data.ok) throw new Error("Chain sync error");
 
-            if (!data.ok) throw new Error("Chain sync error");
+                const balanceTon = parseInt(data.result.balance) / 1000000000;
 
-            const balanceTon = parseInt(data.result.balance) / 1000000000;
-
-            // 3. Insufficient Funds Guard
-            if (balanceTon < total) {
-                window.Telegram?.WebApp?.HapticFeedback.notificationOccurred('error');
-                window.Telegram?.WebApp?.showAlert(
-                    `INSUFFICIENT_FUNDS\nRequired: ${total.toFixed(2)} TON\nAvailable: ${balanceTon.toFixed(2)} TON`
-                );
-                return;
+                if (balanceTon < total) {
+                    window.Telegram?.WebApp?.HapticFeedback.notificationOccurred('error');
+                    window.Telegram?.WebApp?.showAlert(
+                        `INSUFFICIENT_FUNDS\nRequired: ${total.toFixed(2)} TON\nAvailable: ${balanceTon.toFixed(2)} TON`
+                    );
+                    return;
+                }
             }
 
-            // 4. Order Execution
+            // 3. Execution (Same for both, but walletAddress is mocked in Demo)
             const telegramUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
             const orderData = {
-                user: telegramUser?.id?.toString() || "GUEST",
-                walletAddress: userWalletAddress,
+                user: telegramUser?.id?.toString() || "PORTFOLIO_REVIEWER",
+                walletAddress: isDemoMode ? "DEMO_MODE_ACTIVE_00X1" : userWalletAddress,
                 products: cartItems,
                 totalAmount: Number(total.toFixed(2)),
-                status: "PENDING" as const
+                status: isDemoMode ? "DEMO_COMPLETED" : "PENDING" as any
             };
 
             const success = await placeOrder(orderData);
 
             if (success) {
                 window.Telegram?.WebApp?.HapticFeedback.notificationOccurred('success');
+                if (isDemoMode) {
+                    window.Telegram?.WebApp?.showAlert("DEMO ORDER SUCCESSFUL!\nThis order was processed via virtual simulation.");
+                }
                 clearCart();
                 router.push('/profile');
             }
 
         } catch (error) {
             console.error(error);
-            window.Telegram?.WebApp?.showAlert("Network error. Please check your connection.");
+            window.Telegram?.WebApp?.showAlert("Execution failed. Ensure the network is stable.");
         }
     };
 
@@ -116,8 +119,32 @@ export default function UnifiedVault() {
             <PageHeader title="CHECKOUT_CART" />
 
             <main className="relative z-10 pt-20 pb-28 px-6 space-y-4">
+
+                {/* --- DEMO MODE TOGGLE --- */}
+                <div
+                    onClick={() => setIsDemoMode(!isDemoMode)}
+                    className={`p-4 rounded-[24px] border transition-all duration-500 cursor-pointer flex items-center justify-between ${isDemoMode ? 'bg-amber-500/20 border-amber-500/50' : 'bg-white/5 border-white/10 opacity-60'
+                        }`}
+                >
+                    <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDemoMode ? 'bg-amber-500 text-black' : 'bg-zinc-800'}`}>
+                            <FlaskConical size={14} />
+                        </div>
+                        <div>
+                            <span className="block text-[10px] font-black tracking-widest uppercase">Demo_Mode</span>
+                            <span className="text-[8px] text-zinc-500 uppercase tracking-tighter">Bypass Balance & Wallet Check</span>
+                        </div>
+                    </div>
+                    <div className={`w-10 h-5 rounded-full relative transition-colors ${isDemoMode ? 'bg-amber-500' : 'bg-zinc-700'}`}>
+                        <motion.div
+                            animate={{ x: isDemoMode ? 22 : 2 }}
+                            className="absolute top-1 w-3 h-3 bg-white rounded-full shadow-lg"
+                        />
+                    </div>
+                </div>
+
                 {/* --- SECTION 1: INVENTORY --- */}
-                <section className="space-y-3 mt-2">
+                <section className="space-y-3">
                     <AnimatePresence mode='popLayout'>
                         {cartItems.length > 0 ? cartItems.map((item) => (
                             <motion.div
@@ -220,8 +247,10 @@ export default function UnifiedVault() {
                                 <div className="flex flex-col gap-1">
                                     <span className="text-xs font-black text-white uppercase italic tracking-tighter">Total_Cost</span>
                                     <div className="flex items-center gap-2">
-                                        <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
-                                        <span className="text-[7px] font-bold text-zinc-600 uppercase tracking-widest">Finalized_Rate</span>
+                                        <div className={`w-1 h-1 rounded-full animate-pulse ${isDemoMode ? 'bg-amber-500' : 'bg-green-500'}`} />
+                                        <span className="text-[7px] font-bold text-zinc-600 uppercase tracking-widest">
+                                            {isDemoMode ? 'DEMO_SIMULATION' : 'Finalized_Rate'}
+                                        </span>
                                     </div>
                                 </div>
                                 <div className="text-right">
@@ -240,8 +269,8 @@ export default function UnifiedVault() {
                 <StickyButton
                     itemCount={isOrdering ? 0 : total.toFixed(2)}
                     onClick={handleCheckout}
-                    title={!userWalletAddress ? "CONNECT_WALLET" : (isOrdering ? "PROCESSING" : "CHECKOUT")}
-                    subtitle={!userWalletAddress ? "REQUIRED_FOR_PURCHASE" : "SECURE_TRANSACTION"}
+                    title={isDemoMode ? "SIMULATE_ORDER" : (!userWalletAddress ? "CONNECT_WALLET" : (isOrdering ? "PROCESSING" : "CHECKOUT"))}
+                    subtitle={isDemoMode ? "DEMO_ORDER" : (!userWalletAddress ? "CONNECT" : "PROCEED")}
                 />
             )}
         </div>
