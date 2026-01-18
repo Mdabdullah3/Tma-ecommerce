@@ -16,11 +16,9 @@ export default function MobileBoutique2026() {
   const { products, fetchProducts, loading } = useProductStore();
   const { addToCart, cartItems } = useCartStore();
 
-  // --- FIX 1: PREVENT INFINITE LOOP ---
-  // We use an empty dependency array [] so this ONLY runs once when the app opens.
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [fetchProducts]);
 
 
 

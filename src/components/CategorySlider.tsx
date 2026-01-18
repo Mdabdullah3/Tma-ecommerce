@@ -22,7 +22,7 @@ export default function CategorySlider() {
     const [active, setActive] = useState('all');
 
     return (
-        <section className="relative z-20 py-4">
+        <section className="relative z-20 py-3">
 
             <Swiper
                 slidesPerView={'auto'}

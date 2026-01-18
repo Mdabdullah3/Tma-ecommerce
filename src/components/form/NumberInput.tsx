@@ -2,6 +2,7 @@
 import React from 'react';
 import TextInput from './TextInput';
 import { InputHTMLAttributes } from 'react';
+import { Hash } from 'lucide-react';
 
 interface NumberInputProps extends InputHTMLAttributes<HTMLInputElement> {
     label: string;
@@ -12,9 +13,9 @@ const NumberInput: React.FC<NumberInputProps> = ({ label, errorMessage, ...props
     return (
         <TextInput
             type="number"
-            inputMode="decimal" 
-            pattern="[0-9]*[.,]?[0-9]*" 
+            inputMode="decimal"
             label={label}
+            icon={Hash}
             errorMessage={errorMessage}
             {...props}
         />

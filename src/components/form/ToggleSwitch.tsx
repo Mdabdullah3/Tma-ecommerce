@@ -1,58 +1,46 @@
-// components/ToggleSwitch.tsx
 "use client";
 import React, { InputHTMLAttributes } from 'react';
 import { motion } from 'framer-motion';
-import { Check, X } from 'lucide-react';
+import { Globe, Lock } from 'lucide-react';
 
 interface ToggleSwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange'> {
     label: string;
     checked: boolean;
     onChange: (checked: boolean) => void;
-    // If you need to pass specific HTML attributes to the button,
-    // define them here explicitly, e.g.:
-    // disabled?: boolean;
-    // ariaLabel?: string;
-    // id?: string;
 }
 
-const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, checked, onChange, className, ...props }) => {
-    // You can still use `props` for the hidden input if you had one,
-    // but not for the button that handles the toggle logic.
-    // In this component, it seems `props` are not used for anything else.
-
+const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, checked, onChange }) => {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`w-full flex items-center justify-between bg-[#1a1a2e]/70 rounded-xl border-2 border-white/10 p-3 pr-4 transition-all duration-200
-                        ${checked ? 'bg-[#1a1a2e]/90 border-primary/30' : ''}
-                        ${className || ''}`}
+        <div
+            onClick={() => onChange(!checked)}
+            className={`
+                w-full flex items-center justify-between bg-[#0a0a0a] rounded-xl border p-1 pr-4 cursor-pointer transition-all duration-300
+                ${checked ? 'border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.1)]' : 'border-white/10'}
+            `}
         >
-            <span className="text-sm font-bold uppercase text-white tracking-wide">{label}</span>
-            <motion.button
-                type="button"
-                role="switch" // Add ARIA role for accessibility
-                aria-checked={checked} // Indicate checked state for screen readers
-                onClick={() => onChange(!checked)}
-                className={`relative w-14 h-8 rounded-full transition-colors duration-300 flex items-center p-1
-                            ${checked ? 'bg-primary' : 'bg-zinc-700'}`}
-                whileTap={{ scale: 0.95 }}
-            >
+            <div className="flex items-center gap-3 p-3">
+                <div className={`p-2 rounded-lg transition-colors ${checked ? 'bg-emerald-500/10 text-emerald-400' : 'bg-zinc-900 text-zinc-600'}`}>
+                    {checked ? <Globe size={18} /> : <Lock size={18} />}
+                </div>
+                <div className="flex flex-col">
+                    <span className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors ${checked ? 'text-white' : 'text-zinc-500'}`}>
+                        {label}
+                    </span>
+                    <span className="text-[8px] font-mono text-zinc-600">
+                        {checked ? 'ASSET PUBLICLY VISIBLE' : 'INTERNAL DRAFT ONLY'}
+                    </span>
+                </div>
+            </div>
+
+            {/* The Physical Switch */}
+            <div className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${checked ? 'bg-emerald-500/20' : 'bg-zinc-800'}`}>
                 <motion.div
-                    className="w-6 h-6 bg-white rounded-full shadow-md flex items-center justify-center"
-                    layout
-                    transition={{ type: "spring", stiffness: 700, damping: 30 }}
-                    initial={false}
-                    animate={{ x: checked ? 'calc(100% - 2px)' : '0px' }} // Adjusted for padding
-                >
-                    {checked ? (
-                        <Check size={16} className="text-fuchsia-600" />
-                    ) : (
-                        <X size={16} className="text-zinc-700" />
-                    )}
-                </motion.div>
-            </motion.button>
-        </motion.div>
+                    className={`absolute top-1 left-1 w-4 h-4 rounded-full shadow-lg ${checked ? 'bg-emerald-400 shadow-[0_0_10px_#10b981]' : 'bg-zinc-500'}`}
+                    animate={{ x: checked ? 24 : 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                />
+            </div>
+        </div>
     );
 };
 

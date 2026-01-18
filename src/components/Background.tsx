@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 const Background = () => {
     return (
         <div className="fixed inset-0 z-0 pointer-events-none bg-[#020205]">
-            <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[120vw] h-[50vh] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-green-500/80 via-[#050505] to-transparent blur-xl" />
+            <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[120vw] h-[50vh] bg-gradient-radial from-green-500/80 via-[#050505] to-transparent blur-xl" />
             <motion.div
                 animate={{
                     scale: [1, 1.2, 1],

@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Wallet, ShoppingBag,
-    LogOut, Lock, ShieldCheck,
+     Lock, ShieldCheck,
     ScanBarcode, Wifi, Cpu, Activity
 } from 'lucide-react';
 import WebApp from '@twa-dev/sdk';

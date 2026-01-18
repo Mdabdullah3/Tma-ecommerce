@@ -1,59 +1,51 @@
-// components/PrimaryButton.tsx
 "use client";
 import React from 'react';
-import { motion, AnimatePresence, MotionProps } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
-type MotionButtonProps = React.ComponentPropsWithoutRef<'button'> & MotionProps;
-interface PrimaryButtonProps extends MotionButtonProps {
+import { motion, AnimatePresence } from 'framer-motion';
+import { Loader2, ArrowRight } from 'lucide-react';
+interface PrimaryButtonProps extends React.ComponentPropsWithoutRef<typeof motion.button> {
     label: string;
     icon?: React.ElementType;
     isLoading?: boolean;
-    disabled?: boolean;
 }
-
-const PrimaryButton: React.FC<PrimaryButtonProps> = ({ label, icon: Icon, isLoading, disabled, className, ...props }) => {
+const PrimaryButton: React.FC<PrimaryButtonProps> = ({ label, icon: Icon, isLoading, disabled, ...props }) => {
     return (
         <>
             <motion.button
-                whileTap={{ scale: 0.96 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 disabled={isLoading || disabled}
-                className={`w-full h-14 rounded-xl flex items-center justify-center gap-3 text-white font-extrabold italic uppercase text-sm
-                        bg-linear-to-br from-primary to-primary/60 shadow-lg shadow-fuchsia-900/40
-                        hover:from-primary hover:to-primary/70 active:from-fuchsia-700 active:to-purple-700
-                        transition-all duration-200 relative overflow-hidden group
-                        ${isLoading || disabled ? 'opacity-60 cursor-not-allowed' : ''}
-                        ${className || ''}`}
+                className={`
+                relative w-full h-16 rounded-[20px] flex items-center justify-center gap-3 overflow-hidden group
+                ${disabled ? 'bg-zinc-900 cursor-not-allowed opacity-50' : 'bg-white cursor-pointer'}
+            `}
                 {...props}
             >
-                <AnimatePresence mode="wait">
-                    {isLoading ? (
-                        <motion.div
-                            key="loader"
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.8 }}
-                            transition={{ duration: 0.2 }}
-                            className="flex items-center gap-2"
-                        >
-                            <Loader2 size={20} className="animate-spin" />
-                            <span className="text-sm">PROCESSING...</span>
-                        </motion.div>
-                    ) : (
-                        <motion.div
-                            key="content"
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.8 }}
-                            transition={{ duration: 0.2 }}
-                            className="flex items-center gap-2"
-                        >
-                            {Icon && <Icon size={20} className="relative z-10" />}
-                            <span className="relative z-10">{label}</span>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-                {/* Subtle glow effect on hover */}
-                <span className="absolute inset-0 rounded-xl ring-2 ring-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none animate-pulse-light-alt" />
+                <div className="absolute inset-0 bg-linear-to-r from-emerald-400 via-white to-purple-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl" />
+                <div className={`
+                absolute inset-[2px] rounded-2xl flex items-center justify-center gap-3 z-10 transition-colors
+                ${disabled ? 'bg-zinc-900' : 'bg-black group-hover:bg-zinc-900'}
+            `}>
+                    <AnimatePresence mode="wait">
+                        {isLoading ? (
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="flex items-center gap-2 text-zinc-400"
+                            >
+                                <Loader2 size={18} className="animate-spin" />
+                                <span className="text-[10px] font-black tracking-[0.2em]">INITIALIZING...</span>
+                            </motion.div>
+                        ) : (
+                            <div className="flex items-center gap-3">
+                                {Icon && <Icon size={18} className="text-white group-hover:text-emerald-400 transition-colors" />}
+                                <span className="text-xs font-black text-white uppercase tracking-[0.2em] group-hover:text-emerald-400 transition-colors">
+                                    {label}
+                                </span>
+                                <ArrowRight size={16} className="text-zinc-600 group-hover:translate-x-1 transition-transform" />
+                            </div>
+                        )}
+                    </AnimatePresence>
+                </div>
             </motion.button>
         </>
     );

@@ -2,7 +2,7 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-     ShieldCheck, Wallet, Copy,
+    ShieldCheck, Wallet, Copy,
     ExternalLink, ArrowRightLeft, ScanLine, CreditCard, Lock, Zap
 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -55,7 +55,7 @@ export default function WalletPage() {
 
             <div className="relative z-10 px-5 flex flex-col gap-8 mt-2">
 
-            
+
                 {/* 4. MAIN CONTENT (Switches based on REAL Wallet state) */}
                 <AnimatePresence mode="wait">
                     {!wallet ? (
