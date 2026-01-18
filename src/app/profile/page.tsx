@@ -144,11 +144,11 @@ export default function EliteProfile() {
                     </Link>
 
                     {/* Full Width: Admin Vault */}
-                    <div className="col-span-2 mt-1">
+                    <div className="col-span-2 mt-4">
                         <motion.button
                             onClick={() => setShowAdminGate(true)}
                             whileTap={{ scale: 0.98 }}
-                            className="relative w-full h-16 rounded-[24px] bg-[#0c0c0c] border border-dashed border-zinc-800 hover:border-red-900 hover:bg-red-950/10 transition-all group flex items-center justify-center gap-3 overflow-hidden"
+                            className="relative w-full h-16 rounded-[24px] bg-[#0c0c0c] border border-dashed border-red-900 hover:bg-red-950/10 transition-all group flex items-center justify-center gap-3 overflow-hidden"
                         >
                             <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
                             <Lock size={14} className="text-zinc-600 group-hover:text-red-500 transition-colors" />
@@ -159,13 +159,6 @@ export default function EliteProfile() {
                     </div>
                 </section>
 
-                {/* --- 3. FOOTER INFO --- */}
-                <div className="flex flex-col items-center gap-2 pt-6 opacity-30">
-                    <Activity size={14} />
-                    <span className="text-[8px] font-mono uppercase tracking-[0.3em]">
-                        System Stable • v2.4.0
-                    </span>
-                </div>
             </main>
 
             {/* Admin Modal */}
