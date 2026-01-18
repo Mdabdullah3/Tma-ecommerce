@@ -117,7 +117,7 @@ function ConnectView({ onConnect, network }: { onConnect: () => void, network: s
                 <motion.div
                     animate={{ y: [0, -10, 0] }}
                     transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="relative z-10 w-24 h-24 bg-gradient-to-br from-[#1A252B] to-[#0A0F12] rounded-[24px] border border-[#00BC7D]/40 flex items-center justify-center shadow-[0_0_40px_rgba(0,240,255,0.2)] group cursor-pointer"
+                    className="relative z-10 w-24 h-24 bg-linear-to-br from-[#1A252B] to-[#0A0F12] rounded-[24px] border border-[#00BC7D]/40 flex items-center justify-center shadow-[0_0_40px_rgba(0,240,255,0.2)] group cursor-pointer"
                     onClick={onConnect}
                 >
                     <div className="absolute inset-0 bg-[#00BC7D]/10 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -153,7 +153,7 @@ function ConnectedDashboard({ network, address, onDisconnect, balance, isLoading
         >
             {/* 1. HOLOGRAPHIC CARD (The "Black Card") */}
             <div className="w-full aspect-[1.586] rounded-[32px] relative overflow-hidden group ">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#00BC7D] via-[#7B61FF] to-[#FF0080] opacity-100" />
+                <div className="absolute inset-0 bg-linear-to-br from-[#00BC7D] via-[#7B61FF] to-[#FF0080] opacity-100" />
                 <div className="absolute inset-[2px] bg-[#080808] rounded-[30px] z-10" />
 
                 <div className="absolute inset-[2px] z-20 p-6 flex flex-col justify-between overflow-hidden rounded-[30px]">
@@ -186,8 +186,8 @@ function ConnectedDashboard({ network, address, onDisconnect, balance, isLoading
                             </span>
                             <Copy className="w-3 h-3 text-[#00BC7D]" />
                         </div>
-                        <div className="w-10 h-7 rounded-md bg-gradient-to-br from-[#FACC15] to-[#B45309] border border-[#FDE68A]/30 flex items-center justify-center opacity-80">
-                            <div className="w-full h-[1px] bg-black/20" />
+                        <div className="w-10 h-7 rounded-md bg-linear-to-br from-[#FACC15] to-[#B45309] border border-[#FDE68A]/30 flex items-center justify-center opacity-80">
+                            <div className="w-full h-px bg-black/20" />
                         </div>
                     </div>
                 </div>
