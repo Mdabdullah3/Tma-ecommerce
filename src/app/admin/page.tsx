@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
     Activity, Users, ShoppingBag,
-    LogOut, TrendingUp, Cpu, Server,
-    Globe, Zap, ArrowUpRight, Command
+    LogOut, Cpu,
+    Globe, ArrowUpRight, Command
 } from 'lucide-react';
 import Background from '@/components/Background';
 import Link from 'next/link';
@@ -30,7 +30,7 @@ const AdminDashboard = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#030303] text-white font-sans overflow-x-hidden relative pb-32 selection:bg-cyan-500/30">
+        <div className="min-h-screen bg-[#030303] text-white font-sans overflow-x-hidden relative pb-32 selection:bg-emerald-500/30">
             <Background />
 
             {/* --- 1. HOLLYWOOD-STYLE HEADER --- */}
@@ -40,14 +40,14 @@ const AdminDashboard = () => {
                         <Command size={12} />
                         <span className="text-[9px] font-mono uppercase tracking-[0.3em]">Root_Access</span>
                     </div>
-                    <h1 className="text-2xl font-black uppercase tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-600">
-                        Overseer<span className="text-cyan-500">.</span>AI
+                    <h1 className="text-2xl font-black uppercase tracking-tight leading-none text-transparent bg-clip-text bg-linear-to-r from-white to-zinc-600">
+                        Overseer<span className="text-emerald-500">.</span>AI
                     </h1>
                 </div>
 
                 {/* Status Indicator */}
                 <div className="w-10 h-10 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center shadow-[0_0_20px_rgba(34,211,238,0.1)]">
-                    <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_10px_#22d3ee]" />
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#22d3ee]" />
                 </div>
             </header>
 
@@ -62,7 +62,7 @@ const AdminDashboard = () => {
                         className="relative w-full h-full bg-[#080808] rounded-[40px] overflow-hidden border border-white/10 shadow-2xl"
                     >
                         {/* 2A. Background FX */}
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-600/20 blur-[80px] rounded-full mix-blend-screen" />
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/20 blur-[80px] rounded-full mix-blend-screen" />
                         <div className="absolute bottom-0 left-0 w-40 h-40 bg-purple-600/10 blur-[60px] rounded-full mix-blend-screen" />
                         <div className="absolute inset-0 opacity-[0.05] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
@@ -72,7 +72,7 @@ const AdminDashboard = () => {
                             {/* Top Stats Row */}
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <span className="flex items-center gap-2 text-[9px] font-black text-cyan-500 uppercase tracking-widest mb-1">
+                                    <span className="flex items-center gap-2 text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-1">
                                         <Globe size={10} /> Network Velocity
                                     </span>
                                     <div className="flex items-baseline gap-1">
@@ -86,25 +86,17 @@ const AdminDashboard = () => {
                                         <span className="text-lg font-bold text-zinc-500">TON</span>
                                     </div>
                                 </div>
-                                {/* Circular Progress (Decorative) */}
-                                <div className="relative w-12 h-12 flex items-center justify-center">
-                                    <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                                        <path className="text-zinc-800" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="4" />
-                                        <path className="text-cyan-500 drop-shadow-[0_0_5px_#22d3ee]" strokeDasharray="75, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="4" />
-                                    </svg>
-                                    <Zap size={14} className="absolute text-white" />
-                                </div>
                             </div>
 
                             {/* Middle: Live Waveform */}
-                            <div className="flex items-end justify-between h-12 gap-1 px-1">
+                            <div className="flex items-end justify-between h-12 gap-1 px-1 ">
                                 {[30, 50, 45, 70, 40, 60, 80, 50, 70, 90, 60, 40, 30].map((h, i) => (
                                     <motion.div
                                         key={i}
                                         initial={{ height: 10 }}
                                         animate={{ height: `${h}%` }}
                                         transition={{ duration: 1.5, repeat: Infinity, repeatType: "reverse", delay: i * 0.1 }}
-                                        className="w-full rounded-full bg-gradient-to-t from-cyan-500/10 to-cyan-400"
+                                        className="w-full rounded-full bg-linear-to-t from-emerald-500/10 to-emerald-400"
                                     />
                                 ))}
                             </div>
@@ -194,7 +186,7 @@ const AdminDashboard = () => {
                 <Link href="/profile">
                     <motion.button
                         whileTap={{ scale: 0.98 }}
-                        className="w-full mt-4 h-16 rounded-[24px] bg-gradient-to-r from-red-950/30 to-black border border-red-900/30 flex items-center justify-between px-6 group hover:border-red-500/50 transition-all"
+                        className="w-full mt-4 h-16 rounded-[24px] bg-linear-to-r from-red-950/30 to-black border border-red-900/30 flex items-center justify-between px-6 group hover:border-red-500/50 transition-all"
                     >
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-red-700 group-hover:text-red-500 transition-colors">
                             End_Session
