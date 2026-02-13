@@ -18,13 +18,11 @@ const Background = () => {
                 animate={{
                     scale: [1, 1.1, 1],
                     x: [0, -30, 0],
-                    opacity: [0.2, 0.5, 0.2] // Increased opacity
+                    opacity: [0.2, 0.5, 0.2] 
                 }}
                 transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                 className="absolute top-[10%] right-[-20%] w-[80vw] h-[80vh] bg-rose-500/30 blur-[120px] rounded-full mix-blend-screen"
             />
-
-            {/* 3. GOLDEN ACCENT (Matches your NFT Cards) */}
             <motion.div
                 animate={{ opacity: [0.1, 0.3, 0.1] }}
                 transition={{ duration: 5, repeat: Infinity }}
